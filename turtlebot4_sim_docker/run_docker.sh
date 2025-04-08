@@ -10,5 +10,5 @@ docker run -it --rm --net=host \
   -v /home/ideasclinic/Documents:/home/ideasclinic/Documents \
   -v /home/ideasclinic/Documents/challenge_toyota/TMMC-Working/simulation_files:/simulation_files \
   -w /home/ideasclinic/Documents \
-  turtlebot4-image \
+  turtlebot4_test:latest \
   bash -c "cd /simulation_files && ./install_sim_files.sh && bash"
