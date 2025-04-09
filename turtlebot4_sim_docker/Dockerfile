@@ -31,8 +31,8 @@ RUN cp /root/robohub/turtlebot4/configs/.fastdds.xml /root/
 # Append environment configuration to the root user's .bashrc if not already present.
 RUN grep -qxF "source /opt/ros/humble/setup.bash" /root/.bashrc || \
     echo "source /opt/ros/humble/setup.bash" >> /root/.bashrc && \
-    grep -qxF "export TURTLEBOT3_MODEL=burger" /root/.bashrc || \
-    echo "export TURTLEBOT3_MODEL=burger" >> /root/.bashrc
+    grep -qxF "export TURTLEBOT3_MODEL=waffle_pi" /root/.bashrc || \
+    echo "export TURTLEBOT3_MODEL=waffle_pi" >> /root/.bashrc
 
 # Set the default command to run bash so that when you launch the container, you get a shell with the proper environment
 CMD [ "bash" ]
