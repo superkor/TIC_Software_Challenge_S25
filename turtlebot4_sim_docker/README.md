@@ -79,7 +79,11 @@ sudo docker build -t turtlebot4_test:latest .
 
 ### 2. Run the Provided Wrapper Script
 
-The `run_docker.sh` script handles all the necessary configuration for display, audio, and mounting your simulation files. To run the container, simply execute:
+The `run_docker.sh` script handles all the necessary configuration for display, audio, and mounting your simulation files. 
+
+You will need to update the paths within that file, open it up in VSCode and make the changes to lines 11 and 12 as specified in the comments of the file.
+
+Once this is done, run the file using the following command:
 
 ```bash
 sudo ./run_docker.sh
