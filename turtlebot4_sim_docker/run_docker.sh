@@ -7,12 +7,11 @@ docker run -it --rm --net=host \
   -e DISPLAY=$DISPLAY \
   -v /tmp/.X11-unix:/tmp/.X11-unix \
   -v /dev/snd:/dev/snd \
-  # Your will need to change the path to your home directory in the following three lines
+  -v <PUT_PATH_TO_REPO_HERE>/TIC_Software_Challenge_S25:/TIC_Software_Challenge_S25 \
+  -w <PUT_PATH_TO_REPO_HERE>/TIC_SoftwareChallenge_S25 \
+  turtlebot4_test:latest \
+  # Your will need to change the path to your home directory in lines 10 and 11
   # You can get the path to your TIC_Software_Challenge_S25 folder by running the command:
   # readlink -f .
-  # from withing this repo
-  -v /home/ideasclinic/Documents:/home/ideasclinic/Documents \ 
-  -v /home/ideasclinic/Documents/challenge_toyota/TMMC-Working/simulation_files:/simulation_files \
-  -w /home/ideasclinic/Documents \
-  turtlebot4_test:latest \
-  bash -c "cd /simulation_files && ./install_sim_files.sh && bash"
+  # from within this repo
+bash -c "cd /simulation_files && ./install_sim_files.sh && bash"
