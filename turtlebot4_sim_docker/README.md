@@ -21,14 +21,15 @@ echo \
   sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
 sudo apt-get update
 ```
-  - Install latest version:
+  - Install Linux:
 ```
 sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
 ```
-  - Verify successful install
+  - Verify successful install:
 ```
 sudo docker run hello-world
 ```
+
 - **X Server**: An X server must be running (this is typically set up by default on most Linux distributions).
 - **Pre-Built Image**: You will receive the pre-built Docker image, so you do not need to build it yourself.
 
