@@ -127,7 +127,7 @@ Once the sim files are installed, you can launch the simulation with the followi
 ros2 launch turtlebot_tic_world.launch.py
 ```
 - The Gazebo client (GUI) will appear on your host machine.
-- The ROS2 environment is already set up, including sourcing `/opt/ros/humble/setup.bash` and setting the TurtleBot model to `burger`.
+- The ROS2 environment is already set up, including sourcing `/opt/ros/humble/setup.bash` and setting the TurtleBot model to `waffle_pi`.
 
 
 ## Important Note
