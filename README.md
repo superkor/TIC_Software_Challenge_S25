@@ -14,6 +14,7 @@ Controlling the TurtleBots requires ROS2, which only works on Linux devices. To 
 ### Installing a Virtual Machine
 **Note: Make sure you have at least 50GB of free space on your computer before going through this section. If this is an issue, please inform one of the Ideas Clinic staff.**
 1. Download and install VMWare Workstation 17 Player from [here](https://www.techspot.com/downloads/1969-vmware-player.html). <br><br> Note: if you have a Mac that runs with an Intel processor, use [this link](https://www.techspot.com/downloads/2755-vmware-fusion-mac.html) to download and install VMWare Fusion 13.5.2 (the Mac equivalent for Workstation).
+  - Just click next throughout the installation
 
 2. Download this Ubuntu 22.04 ISO file (the 64-Bit Desktop Image) or download and extract the ubuntu-22.04.4-desktop-amd64.iso zip file located in the Sharepoint folder.
 
