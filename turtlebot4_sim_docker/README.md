@@ -1,12 +1,15 @@
 # TurtleBot4 Simulation Environment
 
-This repository provides a pre-built Docker image for running a ROS2 Humble-based simulation environment with TurtleBot4 support and Gazebo. The image comes pre-installed with all necessary ROS2 and TurtleBot4 packages, and it automatically sets up custom simulation files (world and models).
+This folder provides a pre-built Docker image for running a ROS2 Humble-based simulation environment with TurtleBot4 support and Gazebo. The image comes pre-installed with all necessary ROS2 and TurtleBot4 packages, and it automatically sets up custom simulation files (world and models).
 
 ## Prerequisites
 
 - **Docker**: Make sure Docker is installed on your system.
 - **X Server**: An X server must be running (this is typically set up by default on most Linux distributions).
 - **Pre-Built Image**: You will receive the pre-built Docker image, so you do not need to build it yourself.
+
+## Video Walkthrough
+Find a walkthrough of this procees here: [https://www.youtube.com/watch?v=OJLpkSIJko8](https://www.youtube.com/watch?v=OJLpkSIJko8).
 
 ## Directory Structure
 
