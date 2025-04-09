@@ -71,7 +71,7 @@ To start the simulation environment, follow these steps:
 
 ### 1. Download the Pre-Built Docker Image
 
-The Dockerfile has been provided for you already. You can build it using the following command while within this folder (use: "cd turtlebot4_sim_docker" to navigate inside):
+The Dockerfile has been provided for you already. You can build it using the following command while within this folder (use: "cd turtlebot4_sim_docker" to navigate into this folder from your main repository):
 
 ```bash
 sudo docker build -t turtlebot4_test:latest .
