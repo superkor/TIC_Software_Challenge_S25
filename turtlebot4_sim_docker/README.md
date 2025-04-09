@@ -134,8 +134,8 @@ ros2 launch turtlebot_tic_world.launch.py
 If you start a new terminal and want to reconnect to a docker container that is already running, do not run `run_docker.sh`. This will create a new container instance, causing ROS2 nodes to be unable to communicate with each other. Instead, use the following commands to open another terminal inside the same running container:
 
 ```bash
-docker ps   # Find the Container ID or NAME
-docker exec -it <ContainerID_or_Name> bash
+sudo docker ps   # Find the Container ID or NAME
+sudo docker exec -it <ContainerID_or_Name> bash
 ```
 You will need to do this if you want to run Python files while a simulation is running.
 
