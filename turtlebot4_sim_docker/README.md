@@ -83,7 +83,7 @@ sudo docker build -t turtlebot4_test:latest .
 
 The `run_docker.sh` script handles all the necessary configuration for display, audio, and mounting your simulation files. 
 
-You will need to update the paths within that file, open it up in VSCode and make the changes to lines 11 and 12 as specified in the comments of the file.
+**You will need to update the paths within that file, open it up in VSCode and make the changes to lines 11 and 12 as specified in the comments of the file.**
 
 Once this is done, run the file using the following command:
 
@@ -91,7 +91,7 @@ Once this is done, run the file using the following command:
 sudo ./run_docker.sh
 ```
 
-If this command fails with the message "Permissions denied", run the following commands to update the permissions of the files you want to run.
+If this command fails with the message "Permissions denied" OR "sudo: command not found", run the following commands to update the permissions of the files you want to run.
 
 ```bash
 cd ../simulation_files
