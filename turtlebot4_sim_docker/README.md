@@ -21,7 +21,7 @@ This folder provides a pre-built Docker image for running a ROS2 Humble-based si
     sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
   sudo apt-get update
   ```
-  - Install Linux:
+  - Install Docker for Linux:
   ```
   sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
   ```
