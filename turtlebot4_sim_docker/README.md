@@ -52,7 +52,7 @@ This folder provides a pre-built Docker image for running a ROS2 Humble-based si
   ```
 
 ## Video Walkthrough
-Find a walkthrough of this process here: [https://www.youtube.com/watch?v=OJLpkSIJko8](https://www.youtube.com/watch?v=OJLpkSIJko8).
+Find a walkthrough of the setup process here: [https://www.youtube.com/watch?v=OJLpkSIJko8](https://www.youtube.com/watch?v=OJLpkSIJko8).
 
 ## Directory Structure
 
