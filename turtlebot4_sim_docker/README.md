@@ -146,7 +146,7 @@ To control your turtlebot in either the simulation or using a physical robot wit
 python3 name_of_file.py
 ```
 
-To test for the first time, we have provided you with solution-joystick.py in root of this repository. Try it out! If it runs successfully, you should be able to control your turtlebot using the arrow keys on your keyboard.
+To test for the first time, we have provided you with solution-joystick.py in root of this repository. Try it out! If it runs successfully, you should be able to control your turtlebot using the WASD keys on your keyboard.
 
 ## Final Notes
 
