@@ -10,7 +10,7 @@ docker run -it --rm --net=host \
   -v <PUT_PATH_TO_REPO_HERE>/TIC_Software_Challenge_S25:/TIC_Software_Challenge_S25 \
   -w /TIC_SoftwareChallenge_S25 \
   turtlebot4_test:latest \
-  # You will need to change the path to your home directory in lines 10 and 11
+  # You will need to change the path to your home directory in line 10
   # You can get the path to your TIC_Software_Challenge_S25 folder by running the command:
   # readlink -f .
   # from within this repo
