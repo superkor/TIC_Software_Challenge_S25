@@ -31,7 +31,7 @@ This folder provides a pre-built Docker image for running a ROS2 Humble-based si
   ```
 
 - **X Server**: An X server must be running (this is typically set up by default on most Linux distributions).
-- **Pre-Built Image**: You will receive the pre-built Docker image, so you do not need to build it yourself.
+- **Pre-Built Image**: The pre-built docker image has been provided in this repository, so you do not need to build it yourself.
 - **Install VS Code**
   - Update Packages:
   ```
