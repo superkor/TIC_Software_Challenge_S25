@@ -105,17 +105,6 @@ The script will:
 - Automatically execute the simulation installation script (`install_sim_files.sh`).
 - Drop you into an interactive bash shell inside the container.
 
-## Using the Simulation
-
-Once inside the container, you can launch the simulation with the following command:
-
-```bash
-ros2 launch turtlebot3_gazebo turtlebot3_house.launch.py
-```
-
-- The Gazebo client (GUI) will appear on your host machine.
-- The ROS2 environment is already set up, including sourcing `/opt/ros/humble/setup.bash` and setting the TurtleBot model to `burger`.
-
 ## Simulation Files Installation
 
 The `install_sim_files.sh` script (located in the `simulation_files` folder) performs the following tasks:
@@ -129,6 +118,18 @@ cd simulation_files
 chmod +x install_sim_files.sh
 ./install_sim_files.sh
 ```
+
+## Using the Simulation
+
+Once the sim files are installed, you can launch the simulation with the following command. Make sure that you are still inside the `simulation_files` folder.
+
+```bash
+ros2 launch turtlebot3_gazebo turtlebot_tic_world.launch.py
+```
+
+- The Gazebo client (GUI) will appear on your host machine.
+- The ROS2 environment is already set up, including sourcing `/opt/ros/humble/setup.bash` and setting the TurtleBot model to `burger`.
+
 
 ## Important Note
 If you start a new terminal and want to reconnect to a docker container that is already running, do not run `run_docker.sh`. This will create a new container instance, causing ROS2 nodes to be unable to communicate with each other. Instead, use the following commands to open another terminal inside the same running container:
