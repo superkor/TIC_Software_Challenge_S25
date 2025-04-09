@@ -32,6 +32,24 @@ This folder provides a pre-built Docker image for running a ROS2 Humble-based si
 
 - **X Server**: An X server must be running (this is typically set up by default on most Linux distributions).
 - **Pre-Built Image**: You will receive the pre-built Docker image, so you do not need to build it yourself.
+- **Install VS Code**
+  - Update Packages:
+  ```
+  sudo apt update
+  sudo apt install software-properties-common apt-transport-https wget
+  ```
+  - Import Microsoft GPG key:
+  ```
+  wget -q https://packages.microsoft.com/keys/microsoft.asc -O- | sudo apt-key add -
+  ```
+  - Enable VS Code Repository:
+  ```
+  sudo add-apt-repository "deb [arch=amd64] https://packages.microsoft.com/repos/vscode stable main"
+  ```
+  - Install VS Code
+  ```
+  sudo apt install code
+  ```
 
 ## Video Walkthrough
 Find a walkthrough of this procees here: [https://www.youtube.com/watch?v=OJLpkSIJko8](https://www.youtube.com/watch?v=OJLpkSIJko8).
