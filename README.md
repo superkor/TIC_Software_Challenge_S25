@@ -6,7 +6,7 @@
 | 6:15-8pm: Workshop on coding practice and setup | 9am: Challenge introduction from Toyota <br> 12pm: Lunch <br> 5pm: Work period ends| ??? |
 
 ## Challenge Description
-The challenge for this term will be revealed on Saturday morning. During this time, the challenge description document will be uploaded to this repository.
+The challenge is now live! Find the description in the [Challenge_Description.md](https://github.com/IdeasClinicUWaterloo/TIC_Software_Challenge_S25/blob/main/Challenge_Description.md) file.
 
 ## Getting Set Up
 Controlling the TurtleBots requires ROS2, which only works on Linux devices. To get around this on Windows or Mac systems you can install a Virtual Machine to emulate a Linux system. If you are already running Linux or have a VM installed, skip to the **Environment Setup** section.
@@ -34,15 +34,7 @@ Controlling the TurtleBots requires ROS2, which only works on Linux devices. To 
 
 ### Environment Setup
 1. To set up your environment, you will have to first clone this repository. This will require git to be installed. Open up the terminal and enter the command: ```sudo apt install git```.
-2. Clone this repository into your home directory by running the command: ```git clone https://github.com/IdeasClinicUWaterloo/TIC_Software_Challenge_S25.git``` in your home directory. Once this is complete, you are ready to set up your Docker environment. Instructions  for this can be found in the [turtlebot4_sim_docker](https://github.com/IdeasClinicUWaterloo/TIC_Software_Challenge_S25/tree/main/turtlebot4_sim_docker) folder. Once you see "Simulation files installed successfully!" you will be able to upload your own code to control a simulated turtlebot.
-
-### Running the Simulator
-1. Open up the simulator using this command in your docker container: <br> ```ros2 launch turtlebot_tic_world.launch.py```. This should open up a new window called Gazebo on your device.
-2. To run the code to control the turtlebot, first open another command line.
-3. Reconnect to your docker container by running the command ```docker ps``` to get the name of your container, and then ```docker exec -it <Container_ID_or_name> bash```, replacing the last part with the name of your container from the previous line.
-4. You should now be back inside your docker container. Simply run the python file you want to by entering ```python3 <name_of_file>```, rpelacing the last part with the name of the file you want to run. To test, try running the ```solution-joystick.py``` code given in this repository.
-5. You will know the code is working if you are able to control the turtlebot in the simulation using your arrow keys.
-
+2. Clone this repository into your home directory by running the command: ```git clone https://github.com/IdeasClinicUWaterloo/TIC_Software_Challenge_S25.git``` in your home directory. Once this is complete, you are ready to set up your Docker environment. Instructions for this can be found in the [turtlebot4_sim_docker](https://github.com/IdeasClinicUWaterloo/TIC_Software_Challenge_S25/tree/main/turtlebot4_sim_docker) folder. The README in this folder has all the instructions you need for setting up your simulation and connecting to an actual turtlebot. Good luck!
 
 
 ## Software Resources

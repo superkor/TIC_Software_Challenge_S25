@@ -25,10 +25,10 @@ To start the simulation environment, follow these steps:
 
 ### 1. Download the Pre-Built Docker Image
 
-You will receive instructions on how to load/pull the image. For example, if using a tarball, load it with:
+The Dockerfile has been provided for you already. You can build it using the following command while within this folder (use: "cd turtlebot4_sim_docker" to navigate inside):
 
 ```bash
-docker load -i turtlebot4-image.tar
+sudo docker build -t turtlebot4_test:latest .
 ```
 
 ### 2. Run the Provided Wrapper Script
@@ -36,7 +36,16 @@ docker load -i turtlebot4-image.tar
 The `run_docker.sh` script handles all the necessary configuration for display, audio, and mounting your simulation files. To run the container, simply execute:
 
 ```bash
-./run_docker.sh
+sudo ./run_docker.sh
+```
+
+If this command fails with the message "Permissions denied", run the following commands to update the permissions of the files you want to run.
+
+```bash
+cd ../simulation_files
+chmod +x install_sim_files.sh
+cd -
+chmod +x run_docker.sh
 ```
 
 The script will:
@@ -47,25 +56,6 @@ The script will:
 - Automatically execute the simulation installation script (`install_sim_files.sh`).
 - Drop you into an interactive bash shell inside the container.
 
-### `run_docker.sh` Content
-
-```bash
-#!/bin/bash
-# Allow local root connections to the X server (for GUI apps like Gazebo)
-xhost +local:root
-
-# Make sure you change the paths to where you want to work and where your folders are. As an example, we have added our folder in home/ideasclinic/Documents/challenge_toyota/ . 
-docker run -it --rm --net=host \
-  --name challenge \
-  -e DISPLAY=$DISPLAY \
-  -v /tmp/.X11-unix:/tmp/.X11-unix \
-  -v /dev/snd:/dev/snd \
-  -v /home/ideasclinic/Documents:/home/ideasclinic/Documents \
-  -v /home/ideasclinic/Documents/challenge_toyota/TMMC-Working/simulation_files:/simulation_files \
-  -w /home/ideasclinic/Documents \
-  turtlebot4-image \
-  bash -c "cd /simulation_files && ./install_sim_files.sh && bash"
-```
 ## Important Note
 Do not run `run_docker.sh` in a new terminal while a container is already running. This will create a new container instance, causing ROS2 nodes to be unable to communicate with each other. Instead, use the following commands to open another terminal inside the same running container:
 
