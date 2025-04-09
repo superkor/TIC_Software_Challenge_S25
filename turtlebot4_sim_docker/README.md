@@ -124,9 +124,8 @@ chmod +x install_sim_files.sh
 Once the sim files are installed, you can launch the simulation with the following command. Make sure that you are still inside the `simulation_files` folder.
 
 ```bash
-ros2 launch turtlebot3_gazebo turtlebot_tic_world.launch.py
+ros2 launch turtlebot_tic_world.launch.py
 ```
-
 - The Gazebo client (GUI) will appear on your host machine.
 - The ROS2 environment is already set up, including sourcing `/opt/ros/humble/setup.bash` and setting the TurtleBot model to `burger`.
 
