@@ -91,12 +91,9 @@ Once this is done, run the file using the following command:
 sudo ./run_docker.sh
 ```
 
-If this command fails with the message "Permissions denied" OR "sudo: command not found", run the following commands to update the permissions of the files you want to run.
+If this command fails with the message "sudo: ./run_docker command not found", run the following commands to update the permissions of the files you want to run.
 
 ```bash
-cd ../simulation_files
-chmod +x install_sim_files.sh
-cd -
 chmod +x run_docker.sh
 ```
 
@@ -108,13 +105,6 @@ The script will:
 - Automatically execute the simulation installation script (`install_sim_files.sh`).
 - Drop you into an interactive bash shell inside the container.
 
-## Important Note
-Do not run `run_docker.sh` in a new terminal while a container is already running. This will create a new container instance, causing ROS2 nodes to be unable to communicate with each other. Instead, use the following commands to open another terminal inside the same running container:
-
-```bash
-docker ps   # Find the Container ID or NAME
-docker exec -it <ContainerID_or_Name> bash
-```
 ## Using the Simulation
 
 Once inside the container, you can launch the simulation with the following command:
@@ -133,26 +123,30 @@ The `install_sim_files.sh` script (located in the `simulation_files` folder) per
 - Copies `tic_field_v1.world` to the appropriate Gazebo worlds directory.
 - Copies all folders from the `models/` directory into the container’s `/root/.gazebo/models/` directory.
 
-### `install_sim_files.sh` Content
+Run this file using the following commands from the root of your repository.
+```bash
+cd simulation_files
+chmod +x install_sim_files.sh
+./install_sim_files.sh
+```
+
+## Important Note
+If you start a new terminal and want to reconnect to a docker container that is already running, do not run `run_docker.sh`. This will create a new container instance, causing ROS2 nodes to be unable to communicate with each other. Instead, use the following commands to open another terminal inside the same running container:
 
 ```bash
-#!/usr/bin/env bash
-set -e
-
-# Change to the script's directory
-cd "$(dirname "$0")"
-
-# Copy the world file to the TurtleBot3 Gazebo worlds folder
-cp tic_field_v1.world /opt/ros/humble/share/turtlebot3_gazebo/worlds
-
-# Ensure the .gazebo/models directory exists in /root
-mkdir -p /root/.gazebo/models
-
-# Copy all models into /root/.gazebo/models/
-cp -R models/* /root/.gazebo/models/
-
-echo "Simulation files installed successfully!"
+docker ps   # Find the Container ID or NAME
+docker exec -it <ContainerID_or_Name> bash
 ```
+You will need to do this if you want to run Python files while a simulation is running.
+
+## Controlling the TurtleBot with Code
+To control your turtlebot in either the simulation or using a physical robot with a python file, simply open up the docker container command line (see the note above if you are doing this with the sim) and enter:
+
+```bash
+python3 name_of_file.py
+```
+
+To test for the first time, we have provided you with solution-joystick.py in root of this repository. Try it out! If it runs successfully, you should be able to control your turtlebot using the arrow keys on your keyboard.
 
 ## Final Notes
 
