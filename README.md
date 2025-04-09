@@ -8,6 +8,10 @@
 ## Challenge Description
 The challenge is now live! Find the description in the [Challenge_Description.md](https://github.com/IdeasClinicUWaterloo/TIC_Software_Challenge_S25/blob/main/Challenge_Description.md) file.
 
+## Code Documentation
+The documentation for the start code can be found here: 
+[https://docs.google.com/document/d/1OMNe_YqdWdEfYw3CDldJkrOWBQl-ZO1z/edit?usp=sharing&ouid=110563983100333644141&rtpof=true&sd=true](https://docs.google.com/document/d/1OMNe_YqdWdEfYw3CDldJkrOWBQl-ZO1z/edit?usp=sharing&ouid=110563983100333644141&rtpof=true&sd=true)
+
 ## Getting Set Up
 Controlling the TurtleBots requires ROS2, which only works on Linux devices. To get around this on Windows or Mac systems you can install a Virtual Machine to emulate a Linux system. If you are already running Linux or have a VM installed, skip to the **Environment Setup** section.
 
