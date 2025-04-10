@@ -1,4 +1,4 @@
-# TurtleBot4 Simulation Environment
+# TurtleBot4 Programming Environment
 
 This folder provides a pre-built Docker image for running a ROS2 Humble-based simulation environment with TurtleBot4 support and Gazebo. The image comes pre-installed with all necessary ROS2 and TurtleBot4 packages, and it automatically sets up custom simulation files (world and models).
 
