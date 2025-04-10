@@ -41,7 +41,7 @@ Controlling the TurtleBots requires ROS2, which only works on Linux devices. To 
 2. Clone this repository into your home directory by running the command: ```git clone https://github.com/IdeasClinicUWaterloo/TIC_Software_Challenge_S25.git``` in your home directory. <br>**Note:** If you are prompted for a username and password, you will need to create a personal access token to sign in with. Find instructions for doing that [here](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens#creating-a-personal-access-token-classic). Copy the token you make and use that as your password when you sign in.
 3. Once this is complete, you are ready to set up your Docker environment. Instructions for this can be found in the [turtlebot4_sim_docker](https://github.com/IdeasClinicUWaterloo/TIC_Software_Challenge_S25/tree/main/turtlebot4_sim_docker) folder. The README in this folder has all the instructions you need for setting up your simulation and connecting to an actual turtlebot.
 
-## Coding your solution
+## Coding Your Solution
 Once the challenge is live, you will be able to see the challenge description for what your solution should look like. We have provided you a space to put your solution inside the solution.py file, though you are able to change the provided files or create your own to best suit your needs. There are six parts to the challenge, but you do not have to complete them all - focus on coming up with the best solutions you can for the whole challenge. 
 ### Remember that you are not just marked on how far you get into the challenge, but your presentation and design choices as well.
 
