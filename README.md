@@ -5,8 +5,8 @@
 | --- | --- | --- |
 | 6:15-8pm: Workshop on coding practice and setup | 9am: Challenge introduction from Toyota <br> 12pm: Lunch <br> 5pm: Work period ends| ??? |
 
-## Challenge Description
-The challenge is now live! Find the description in the [Challenge_Description.md](https://github.com/IdeasClinicUWaterloo/TIC_Software_Challenge_S25/blob/main/Challenge_Description.md) file.
+## Challenge Description and documentation
+The challenge is now live! Find the description, documentation, rubric, and presentation template at [https://github.com/IdeasClinicUWaterloo/TIC_Software_Challenge_S25/blob/main/Challenge_Description.mdhttps://drive.google.com/drive/folders/1U0qSvJUjqUBoHz40CjrrwecNmML-Dhgb?usp=sharing](https://drive.google.com/drive/folders/1U0qSvJUjqUBoHz40CjrrwecNmML-Dhgb?usp=sharing).
 
 ## Code Documentation
 The documentation for the start code can be found here: 
