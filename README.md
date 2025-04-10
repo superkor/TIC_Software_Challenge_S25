@@ -40,7 +40,3 @@ Controlling the TurtleBots requires ROS2, which only works on Linux devices. To 
 1. To set up your environment, you will have to first clone this repository. This will require git to be installed. Open up the terminal and enter the command: ```sudo apt install git```.
 2. Clone this repository into your home directory by running the command: ```git clone https://github.com/IdeasClinicUWaterloo/TIC_Software_Challenge_S25.git``` in your home directory. <br>**Note:** If you are prompted for a username and password, you will need to create a personal access token to sign in with. Find instructions for doing that [here](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens#creating-a-personal-access-token-classic). Copy the token you make and use that as your password when you sign in.
 3. Once this is complete, you are ready to set up your Docker environment. Instructions for this can be found in the [turtlebot4_sim_docker](https://github.com/IdeasClinicUWaterloo/TIC_Software_Challenge_S25/tree/main/turtlebot4_sim_docker) folder. The README in this folder has all the instructions you need for setting up your simulation and connecting to an actual turtlebot. Good luck!
-
-
-## Software Resources
-- The functions have been written to streamline your development. The following documentation describes those functions: [Robot Documentation](https://docs.google.com/document/d/1OMNe_YqdWdEfYw3CDldJkrOWBQl-ZO1z/edit)
