@@ -45,7 +45,7 @@ from ultralytics import YOLO
 CONST_speed_control = 1 #set this to 1 for full speed, 0.5 for half speed
 DEBUG = False #set to false to disable terminal printing of some functions
 
-is_SIM = False #to disable some functions that can not be used on the sim
+is_SIM = True #to disable some functions that can not be used on the sim
 
 #not sure if we need , modify later, seems like an init thing
 def use_hardware():
