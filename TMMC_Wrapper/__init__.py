@@ -439,35 +439,82 @@ class Robot(Node):
     def start_keyboard_input(self):
         self.input = True
 
-    def start_keyboard_control(self):
+        def start_keyboard_control(self):
         if self.keyboard_listener is None:
-            def on_press(key):
-                try:
-                    #print(f"Key {key.char} pressed")
-                    key_char = key.char
-                except AttributeError:
-                    #print(f"Special key {key} pressed")
-                    key_char = str(key) #---the below cluster of if statements can be removed to make level one more challenging---
-                if key_char == 'w':
+            # This set holds keys that are currently pressed.
+            pressed_keys = set()
+
+            self.stop_event = threading.Event()
+
+            def update_command():
+                # Check for combined key movements first.
+                if 'w' in pressed_keys and 'a' in pressed_keys:
+                    if self.input:
+                        self.send_cmd_vel(0.5, 1.0)
+                    return
+                elif 'w' in pressed_keys and 'd' in pressed_keys:
+                    if self.input:
+                        self.send_cmd_vel(0.5, -1.0)
+                    return
+                elif 's' in pressed_keys and 'a' in pressed_keys:
+                    if self.input:
+                        self.send_cmd_vel(-0.5, 1.0)
+                    return
+                elif 's' in pressed_keys and 'd' in pressed_keys:
+                    if self.input:
+                        self.send_cmd_vel(-0.5, -1.0)
+                    return
+
+                # Process individual keys.
+                if 'w' in pressed_keys:
                     if self.input:
                         self.move_forward()
-                if key_char == 's':
+                elif 's' in pressed_keys:
                     if self.input:
                         self.move_backward()
-                if key_char == 'a':
+                elif 'a' in pressed_keys:
                     if self.input:
                         self.turn_left()
-                if key_char == 'd':
+                elif 'd' in pressed_keys:
                     if self.input:
                         self.turn_right()
+                else:
+                    # If no keys are pressed, stop the movement.
+                    self.send_cmd_vel(0.0, 0.0)
+
+            def key_control_loop():
+                while not self.stop_event.is_set():
+                    update_command()
+                    time.sleep(0.05)
+
+            def on_press(key):
+                try:
+                    key_char = key.char
+                except AttributeError:
+                    key_char = str(key)
+
+                pressed_keys.add(key_char)
+
             def on_release(key):
-                self.send_cmd_vel(0.0, 0.0)
-                self.is_reversing = False
-                #print("Key released and robot stopping.")
+                try:
+                    key_char = key.char
+                except AttributeError:
+                    key_char = str(key)
+
+                pressed_keys.discard(key_char)
+
+
+            # Start the keyboard listener.
             self.keyboard_listener = Listener(on_press=on_press, on_release=on_release)
             self.keyboard_listener.start()
+            
+            # Start the continuous update thread. Make sure it is a daemon thread so it doesn't block shutdown.
+            self.update_thread = threading.Thread(target=key_control_loop, daemon=True)
+            self.update_thread.start()
         else:
             print("Keyboard listener already running")
+
+
 
     def stop_keyboard_control(self):
         if self.keyboard_listener is not None:
@@ -476,6 +523,11 @@ class Robot(Node):
             print("Keyb list stopped")
         else: 
             print("Keyb list is not running")
+
+        if hasattr(self, 'stop_event'):
+            self.stop_event.set()
+        if hasattr(self, 'update_thread'):
+            self.update_thread.join()
 
     def move_forward(self):
         self.send_cmd_vel(1.0*CONST_speed_control, 0.0)
