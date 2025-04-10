@@ -6,7 +6,7 @@
 | 6:15-8pm: Workshop on coding practice and setup | 9am: Challenge introduction from Toyota <br> 12pm: Lunch <br> 5pm: Work period ends| ??? |
 
 ## Challenge Description and documentation
-The challenge is now live! Find the description, documentation, rubric, and presentation template at [https://drive.google.com/drive/folders/1U0qSvJUjqUBoHz40CjrrwecNmML-Dhgb?usp=sharing](https://drive.google.com/drive/folders/1U0qSvJUjqUBoHz40CjrrwecNmML-Dhgb?usp=sharing).
+The challenge is now live! Find the description, rubric, and presentation template at [https://drive.google.com/drive/folders/1U0qSvJUjqUBoHz40CjrrwecNmML-Dhgb?usp=sharing](https://drive.google.com/drive/folders/1U0qSvJUjqUBoHz40CjrrwecNmML-Dhgb?usp=sharing).
 
 ## Code Documentation
 The documentation for the start code can be found here: 
