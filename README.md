@@ -45,4 +45,4 @@ Controlling the TurtleBots requires ROS2, which only works on Linux devices. To 
 Once the challenge is live, you will be able to see the challenge description and rubric. We have provided you a space to put your solution inside the solution.py file, though you are able to change the provided files or create your own to best suit your needs. There are six parts to the challenge, but you do not have to complete them all - focus on coming up with the best solutions you can for the whole challenge. 
 ### Remember that you are not just marked on how far you get into the challenge, but your presentation and design choices as well.
 
-Good luck!
+Good luck and have fun!
