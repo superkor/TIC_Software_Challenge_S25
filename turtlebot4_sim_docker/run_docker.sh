@@ -3,6 +3,7 @@
 xhost +local:root
 
 docker run -it --rm --net=host \
+  --cap-add=NET_ADMIN --device=/dev/net/tun \
   --name challenge \
   -e DISPLAY=$DISPLAY \
   -v /tmp/.X11-unix:/tmp/.X11-unix \
