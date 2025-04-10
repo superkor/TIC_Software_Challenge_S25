@@ -176,8 +176,3 @@ python3 name_of_file.py
 ### Important: All Python files provided will have a line "TMMC_Wrapper.is_sim = True". If you wish to connect to a physical turtlebot, you must first set this variable to False.
 
 To test for the first time, we have provided you with solution-joystick.py in root of this repository. Try it out! If it runs successfully, you should be able to control your turtlebot using the WASD keys on your keyboard.
-
-
-## Final Notes
-
-This container runs as the root user; therefore, environment paths such as the home directory are set to `/root`. Ensure your necessary files are accessible within this environment.
