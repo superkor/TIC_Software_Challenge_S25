@@ -54,16 +54,6 @@ This folder provides a pre-built Docker image for running a ROS2 Humble-based si
 ## Video Walkthrough
 Find a walkthrough of the setup process here: [https://www.youtube.com/watch?v=OJLpkSIJko8](https://www.youtube.com/watch?v=OJLpkSIJko8).
 
-## Directory Structure
-
-```
-.
-├── simulation_files/
-│   ├── tic_field_v1.world  # Custom Gazebo world file
-│   ├── models/             # Folder containing the simulation models
-│   └── install_sim_files.sh  # Script that installs the simulation files inside the container
-└── run.sh  # Wrapper script to run the container with proper settings
-```
 
 ## Running the Container
 
