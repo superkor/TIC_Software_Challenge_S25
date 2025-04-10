@@ -30,8 +30,6 @@ This folder provides a pre-built Docker image for running a ROS2 Humble-based si
   sudo docker run hello-world
   ```
 
-- **X Server**: An X server must be running (this is typically set up by default on most Linux distributions).
-- **Pre-Built Image**: The pre-built docker image has been provided in this repository, so you do not need to build it yourself.
 - **Install VS Code**
   - Update Packages:
   ```
@@ -50,6 +48,8 @@ This folder provides a pre-built Docker image for running a ROS2 Humble-based si
   ```
   sudo apt install code
   ```
+- **X Server**: An X server must be running (this is typically set up by default on most Linux distributions).
+- **Pre-Built Image**: The pre-built docker image has been provided in this repository, so you do not need to build it yourself.
 
 ## Video Walkthrough
 Find a walkthrough of the setup process here: [https://www.youtube.com/watch?v=OJLpkSIJko8](https://www.youtube.com/watch?v=OJLpkSIJko8).
