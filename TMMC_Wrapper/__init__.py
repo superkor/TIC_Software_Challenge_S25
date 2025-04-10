@@ -439,7 +439,7 @@ class Robot(Node):
     def start_keyboard_input(self):
         self.input = True
 
-        def start_keyboard_control(self):
+    def start_keyboard_control(self):
         if self.keyboard_listener is None:
             # This set holds keys that are currently pressed.
             pressed_keys = set()
