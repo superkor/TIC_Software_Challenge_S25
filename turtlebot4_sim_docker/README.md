@@ -119,7 +119,7 @@ chmod +x install_sim_files.sh
 ./install_sim_files.sh
 ```
 
-## Using the Simulation
+## Running the Simulation
 
 Once the sim files are installed, you can launch the simulation with the following command. Make sure that you are still inside the `simulation_files` folder.
 
@@ -129,15 +129,42 @@ ros2 launch turtlebot_tic_world.launch.py
 - The Gazebo client (GUI) will appear on your host machine.
 - The ROS2 environment is already set up, including sourcing `/opt/ros/humble/setup.bash` and setting the TurtleBot model to `waffle_pi`.
 
+## Connecting to a physical TurtleBot
+
+To run the script to connect to the turtlebot, make sure you are inside the docker container as described in steps 1 and 2. Then navigate to the robohub folder with:
+
+```bash
+cd robohub/rendezvous_vpn
+```
+
+You will need to update the permissions of two files with the following commands.
+
+```bash
+chmod +x vpn.sh
+chmod +x turtlebot-tap-up.sh
+```
+
+Then connect to the robot by running the following script, replacing the <NUMBER_OF_TURTLEBOT> with the number on the sticker of the turtlebot you wish to use:
+```bash
+sudo ./vpn.sh <NUMBER_OF_TURTLEBOT>
+```
+
+You will know it was successful once you see:
+```
+Tunnel ready
+Stopping this process will terminate the VPN
+Don't forget to restart the ros2 daemon if necessary
+```
 
 ## Important Note
 If you start a new terminal and want to reconnect to a docker container that is already running, do not run `run_docker.sh`. This will create a new container instance, causing ROS2 nodes to be unable to communicate with each other. Instead, use the following commands to open another terminal inside the same running container:
 
 ```bash
-sudo docker ps   # Find the Container ID or NAME
-sudo docker exec -it <ContainerID_or_Name> bash
+sudo docker ps   # Find the Container ID
+sudo docker exec -it <ContainerID> bash
 ```
-You will need to do this if you want to run Python files while a simulation is running.
+You will need to do this if you want to run Python files while a simulation or connection is running.
+
 
 ## Controlling the TurtleBot with Code
 To control your turtlebot in either the simulation or using a physical robot with a python file, simply open up the docker container command line (see the note above if you are doing this with the sim) and enter:
@@ -146,7 +173,10 @@ To control your turtlebot in either the simulation or using a physical robot wit
 python3 name_of_file.py
 ```
 
+### Important: All Python files provided will have a line "TMMC_Wrapper.is_sim = True". If you wish to connect to a physical turtlebot, you must first set this variable to False.
+
 To test for the first time, we have provided you with solution-joystick.py in root of this repository. Try it out! If it runs successfully, you should be able to control your turtlebot using the WASD keys on your keyboard.
+
 
 ## Final Notes
 
