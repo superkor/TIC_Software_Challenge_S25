@@ -1,5 +1,5 @@
 #start with imports, ie: import the wrapper
-import TMMC_Wrapper
+from TMMC_Wrapper import Constants, Robot, Control
 import rclpy
 import numpy as np
 import math
@@ -8,19 +8,19 @@ import math
 if not rclpy.ok():
     rclpy.init()
 
-TMMC_Wrapper.is_SIM = True
-if not TMMC_Wrapper.is_SIM:
+Constants.is_SIM = True
+if not Constants.is_SIM:
     #specify hardware api
-    TMMC_Wrapper.use_hardware()
+    Constants.use_hardware()
     
 if not "robot" in globals():
-    robot = TMMC_Wrapper.Robot()
+    robot = Robot()
 
 #debug messaging 
 print("running main")
 
 #start processes
-robot.start_keyboard_control()   #this one is just pure keyboard control
+Control.start_keyboard_control(robot)   #this one is just pure keyboard control
 
 rclpy.spin_once(robot, timeout_sec=0.1)
 
@@ -33,7 +33,7 @@ except KeyboardInterrupt:
     print("keyboard interrupt receieved.Stopping...")
 finally:
     #when exiting program, run the kill processes
-    robot.stop_keyboard_control()
+    Control.stop_keyboard_control(robot)
     robot.destroy_node()
     rclpy.shutdown()
 
