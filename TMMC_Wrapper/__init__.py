@@ -30,7 +30,7 @@ import eigenpy
 import numpy as np
 import os
 import subprocess
-from pynput.keyboard import Listener
+from pynput.keyboard import Listener, Controller, Key
 import math
 import threading
 
@@ -45,7 +45,7 @@ from ultralytics import YOLO
 CONST_speed_control = 1 #set this to 1 for full speed, 0.5 for half speed
 DEBUG = False #set to false to disable terminal printing of some functions
 
-is_SIM = True #to disable some functions that can not be used on the sim
+is_SIM = False #to disable some functions that can not be used on the sim
 
 #not sure if we need , modify later, seems like an init thing
 def use_hardware():
@@ -130,6 +130,8 @@ class Robot(Node):
         self.keyboard_listener = None #temp placeholder for the keyboard listener
 
         self.input = True
+        self.k = None
+        self.tag_size = 0.25 #april tag size in meters
     
     def get_tf_transform(self,parent_frame,child_frame,wait=True,time_in=rclpy.time.Time()):
         if wait:
@@ -309,6 +311,8 @@ class Robot(Node):
 #-----camera listeners and grabbers-----  
     def camera_info_listener_callback(self, msg):
         self.last_camera_info_msg = msg
+        if self.k is None:
+            self.k = np.array(msg.k).reshape((3, 3))
         self.camera_info_future.set_result(msg)
         self.camera_info_future.done()
 
@@ -439,6 +443,7 @@ class Robot(Node):
 
     def start_keyboard_input(self):
         self.input = True
+
 
     def start_keyboard_control(self):
         if self.keyboard_listener is None:
@@ -703,32 +708,9 @@ class Robot(Node):
         #print(f"Left (Lidar Back): {left} meters")
 
 #--functions for camera detections
+    def estimate_apriltag_pose(self, image):
 
-    def detect_april_tag_from_img(self, img):
-        """
-            returns the april tag id, translation vector and rotation matrix from
-            :param img: image from camera stream, np array
-            :return: dict: {int tag_id: tuple (float distance, float angle)}
-            
-        # convert image to grayscale
-        img_gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-        cv2.imshow("gray",img_gray)
-        options = apriltag.DetectorOptions(families="tag16h5, tag25h9")
-        # Apriltag detection
-        detector = apriltag.Detector(options)
-        detections = detector.detect(img_gray)
-        # dictionary for return
-        dict = {}
-        # process each apriltag found in image to get the id and spacial information
-        for detection in detections:
-            tag_id = detection.tag_id
-            translation_vector, rotation_matrix = self.homography_to_pose(detection.homography)
-            dict[int(tag_id)] = (self.translation_vector_to_distance(translation_vector), self.rotation_matrix_to_angles(rotation_matrix))
-        return dict
-        """
-
-        '''
-        img_gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+        img_gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
         cv2.imshow("gray", img_gray)
         cv2.waitKey(1)  # Add a small delay so the window can update
         
@@ -737,148 +719,48 @@ class Robot(Node):
         detector = apriltag.Detector(options)
         detections = detector.detect(img_gray)
         
-        # Dictionary to hold detection results
-        result_dict = {}
-        
-        # Process each detected AprilTag
-        for detection in detections:
-            tag_id = detection.tag_id
-            # detection.homography should be a 3x3 matrix
-            t, R = self.homography_to_pose(detection.homography)
-            distance = self.translation_vector_to_distance(t)
-            angles = self.rotation_matrix_to_angles(R)
-            result_dict[int(tag_id)] = (distance, angles)
-            
-        return result_dict
-        '''
-        img_gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-        cv2.imshow("gray", img_gray)
-        cv2.waitKey(1)  # Add a small delay so the window can update
-        
-        # Set up AprilTag detector options; adjust families as needed.
-        options = apriltag.DetectorOptions(families="tag16h5, tag25h9")
-        detector = apriltag.Detector(options)
-        detections = detector.detect(img_gray)
-        
-        # Dictionary to hold detection results
-        result_dict = {}
-        
-        # Process each detected AprilTag
-        for detection in detections:
-            tag_id = detection.tag_id
-            # detection.homography should be a 3x3 matrix
-            t, R = self.homography_to_pose(detection.homography)
-            distance = self.translation_vector_to_distance(t)
-            center = detection.center
-            cX, cY = int(center[0]), int(center[1])
-            result_dict[int(tag_id)] = (distance, cX/len(img[0]), cY/len(img)) 
-            # divide by width and height of image to give centre of the tag as a decimal value
-            
-        return result_dict
+ 
+        if len(detections) == 0 or self.k is None:
+            return None
 
-#--Helper Functions for Computer Vision - not supposed to be called outside of the class
-# AprilTag
-    @staticmethod
-    def homography_to_pose(H):
-        """
-        Convert a homography matrix to rotation matrix and translation vector.
-        :param H: list homography matrix
-        :return: tuple (list translation_vector, list rotational_matrix)
+        # For simplicity, use the first detected tag.
+        detection = detections[0]
+        tag_id = detection.tag_id
         
-        # Perform decomposition of the homography matrix
-        R, Q, P = np.linalg.svd(H)
+        # Extract the image coordinates of the tag's four corners.
+        image_points = np.array(detection.corners, dtype=np.float32)
+        
+        # Define the tag's physical corner coordinates in its own coordinate system.
+        # Here the tag is centered at (0,0,0) and lies on the XY plane.
+        half_size = self.tag_size / 2.0
+        object_points = np.array([
+            [-half_size,  half_size, 0],
+            [ half_size,  half_size, 0],
+            [ half_size, -half_size, 0],
+            [-half_size, -half_size, 0]
+        ], dtype=np.float32)
+        
+        # Estimate the pose of the tag relative to the camera.
+        ret, rvec, tvec = cv2.solvePnP(object_points, image_points, self.k, None)
+        if not ret:
+            print("Pose estimation failed.")
+            return None
 
-        # Ensure rotation matrix has determinant +1
-        if np.linalg.det(R) < 0:
-            R = -R
+        # Flatten tvec for simpler processing.
+        tvec = tvec.flatten()
+        
+        # Compute the range (Euclidean distance).
+        range_ = np.linalg.norm(tvec)
+        
+        # Calculate the bearing and elevation (in degrees) relative to the camera's forward axis.
+        # For a typical camera coordinate system:
+        #   - x axis: right, y axis: down, z axis: forward.
+        bearing = np.degrees(np.arctan2(tvec[0], tvec[2]))
+        elevation = np.degrees(np.arctan2(tvec[1], tvec[2]))
+        
+        return tag_id, range_, bearing, elevation
 
-        # Extract translation vector
-        t = H[:, 2] / np.linalg.norm(H[:, :2], axis=1)
 
-        return t, R
-        """
-        K = np.array([[1031.93310546875, 0.0, 645.0684814453125],
-                      [0.0, 1031.93310546875, 365.84869384765625],
-                      [0.0, 0.0, 1.0]])
-        K_inv = np.linalg.inv(K)
-        H_norm = np.dot(K_inv, H)
-        
-        # Extract the columns of the normalized homography
-        h1 = H_norm[:, 0]
-        h2 = H_norm[:, 1]
-        h3 = H_norm[:, 2]
-        
-        # Compute a scale factor lambda from the norms of h1 and h2
-        norm_h1 = np.linalg.norm(h1)
-        norm_h2 = np.linalg.norm(h2)
-        lam = 1.0 / ((norm_h1 + norm_h2) / 2.0)
-        
-        # Obtain the rotation columns (up to scale)
-        r1 = lam * h1
-        r2 = lam * h2
-        r3 = np.cross(r1, r2)
-        
-        # Translation vector
-        t = lam * h3
-        
-        # Build an initial rotation matrix
-        R_init = np.column_stack((r1, r2, r3))
-        
-        # Enforce orthonormality by finding the closest proper rotation matrix via SVD
-        U, _, Vt = np.linalg.svd(R_init)
-        R = np.dot(U, Vt)
-        if np.linalg.det(R) < 0:
-            R = -R
-        
-        return t, R
-
-    @staticmethod
-    def rotation_matrix_to_angles(R):
-        """
-        Convert a 3x3 rotation matrix to Euler angles (in degrees).
-        Assumes the rotation matrix represents a rotation in the XYZ convention.
-        :param R, rotation_matrix: list
-        :return: list [float angle_x, float angle_y, float angle_z]
-        
-        sy = math.sqrt(R[0,0] * R[0,0] +  R[1,0] * R[1,0])
-        singular = sy < 1e-6
-        if  not singular :
-            x = math.atan2(R[2,1] , R[2,2])
-            y = math.atan2(-R[2,0], sy)
-            z = math.atan2(R[1,0], R[0,0])
-        else :
-            x = math.atan2(-R[1,2], R[1,1])
-            y = math.atan2(-R[2,0], sy)
-            z = 0
-        return np.array([x, y, z])
-        """
-        """
-        Convert a rotation matrix to Euler angles (roll, pitch, yaw) using a ZYX convention.
-        Adjust the convention as needed.
-        
-        :param R: 3x3 rotation matrix.
-        :return: tuple of angles in degrees: (roll, pitch, yaw)
-        """
-        sy = np.sqrt(R[0, 0]**2 + R[1, 0]**2)
-        singular = sy < 1e-6
-        if not singular:
-            roll = np.arctan2(R[2, 1], R[2, 2])
-            pitch = np.arctan2(-R[2, 0], sy)
-            yaw = np.arctan2(R[1, 0], R[0, 0])
-        else:
-            roll = np.arctan2(-R[1, 2], R[1, 1])
-            pitch = np.arctan2(-R[2, 0], sy)
-            yaw = 0
-        return (np.degrees(roll), np.degrees(pitch), np.degrees(yaw))
-
-    @staticmethod
-    def translation_vector_to_distance(translation_vector):
-        """
-        Convert the translation vector to a distance (Euclidean norm).
-        :param t: 3-element translation vector.
-        :return: scalar distance.
-        """
-        return np.linalg.norm(translation_vector)
 
 # stop sign
     @staticmethod
