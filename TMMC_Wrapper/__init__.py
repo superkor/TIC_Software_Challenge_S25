@@ -7,15 +7,26 @@ from .Lidar import Lidar
 from .Logging import Logging
 from .Control import Control
 from .Robot import Robot
+import rclpy
 
+
+control = None
+robot = None
+
+def initialize():
+    global control
+    global robot
+    robot = Robot()
+    control = Control(robot)
     
 __all__ = [
+    "initialize",
     "Constants",
     "Battery",
     "Camera",
-    "Control",
+    "control",
     "IMU",
     "Lidar",
     "Logging",
-    "Robot"
+    "robot"
 ]
