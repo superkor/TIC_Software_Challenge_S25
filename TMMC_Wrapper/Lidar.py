@@ -1,4 +1,5 @@
-from TMMC_Wrapper import DEBUG, CONST_speed_control, is_SIM
+from .Constants import Constants
+import numpy as np
 
 class Lidar:
     @staticmethod
@@ -31,7 +32,7 @@ class Lidar:
         return float(num_too_close) / total
 
     @staticmethod
-    def detect_obstacle_in_cone(self, scan, distance, center, offset_angle):
+    def detect_obstacle_in_cone(scan, distance, center, offset_angle):
         obstacle_dist = distance
 
         if scan is None:
@@ -39,7 +40,7 @@ class Lidar:
             return -1,-1
         
 
-        if is_SIM:
+        if Constants.is_SIM:
             left = center + offset_angle
             right = center - offset_angle
 
@@ -108,9 +109,9 @@ class Lidar:
 
 
     @staticmethod
-    def test_lidar_orientation(self):
+    def test_lidar_orientation(robot):
         #---this was used to find the front heading of the robot, should not be used in solutions
-        ranges = self.last_scan_msg.ranges
+        ranges = robot.last_scan_msg.ranges
         num_ranges = len(ranges)
         quarter_segment = num_ranges // 4
         degrees_per_range = 360 / num_ranges

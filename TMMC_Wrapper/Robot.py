@@ -1,4 +1,4 @@
-from TMMC_Wrapper import DEBUG, CONST_speed_control, is_SIM
+from .Constants import Constants
 from rclpy.node import Node
 from sensor_msgs.msg import LaserScan
 from sensor_msgs.msg import Imu
@@ -6,10 +6,14 @@ from sensor_msgs.msg import Image, CameraInfo
 from sensor_msgs.msg import BatteryState
 from rclpy.action import ActionClient
 import tf2_ros
+import rclpy
 from irobot_create_msgs.action import Dock,Undock
 from irobot_create_msgs.srv import ResetPose
 from geometry_msgs.msg import Twist
 import numpy as np
+import os
+import subprocess
+import time
 
 class Robot(Node):
     def __init__(self):
@@ -34,14 +38,14 @@ class Robot(Node):
         self.imu_subscription  # prevent unused variable warning
         
         self.image_future = rclpy.Future()
-        if is_SIM:
+        if Constants.is_SIM:
             self.image_subscription = self.create_subscription(Image,'/camera/image_raw',self.image_listener_callback,qos_profile_sensor_data)
         else:
             self.image_subscription = self.create_subscription(Image,'/oakd/rgb/preview/image_raw',self.image_listener_callback,qos_profile_sensor_data)
         self.image_subscription  # prevent unused variable warning
 
         self.camera_info_future = rclpy.Future()
-        if is_SIM:
+        if Constants.is_SIM:
             self.camera_info_subscription = self.create_subscription(CameraInfo,'/camera/camera_info',self.camera_info_listener_callback,qos_profile_sensor_data)
         else:
             self.camera_info_subscription = self.create_subscription(CameraInfo,'oakd/rgb/preview/camera_info',self.camera_info_listener_callback,qos_profile_sensor_data)
@@ -51,7 +55,7 @@ class Robot(Node):
         self.battery_state_subscription = self.create_subscription(BatteryState,'/battery_state',self.battery_state_listener_callback,qos_profile_sensor_data)
         self.battery_state_subscription  # prevent unused variable warning
 
-        if (not(is_SIM)): 
+        if (not(Constants.is_SIM)): 
             self.dock_client = ActionClient(self, Dock, '/dock')
             self.undock_client = ActionClient(self, Undock, '/undock')
             self.dock_client.wait_for_server()
@@ -68,20 +72,47 @@ class Robot(Node):
 
         self.input = True
         self.k = None
-        self.tag_size = 0.25 #april tag size in meters
-        
+
+    def use_hardware(self):
+        if not Constants.is_SIM:
+            # import ROS settings for working locally or with the robot (equivalent of ros_local/ros_robot in the shell)
+            env_file = ".env_ros_robot"
+            os.environ.update(dict([l.strip().split("=") for l in filter(lambda x: len(x.strip())>0,open(env_file).readlines())]))
+            try:
+                output = subprocess.check_output("ip addr show",shell=True)
+                import re
+                robot_id = int(re.search(r"tap[0-9]\.([0-9]+)@tap",output.decode()).groups()[0])
+            except Exception as ex:
+                raise Exception("VPN does not seem to be running, did you start it?:",ex)
+            print("You are connected to uwbot-{:02d}".format(robot_id))
+            try:
+                subprocess.check_call("ping -c 1 -w 10 192.168.186.3",shell=True,stdout=subprocess.DEVNULL)
+            except Exception as ex:
+                raise Exception("Could not ping robot (192.168.186.3)")
+            print("Robot is reachable")
+            try:
+                subprocess.check_call("ros2 topic echo --once /ip",shell=True,stdout=subprocess.DEVNULL)
+            except Exception as ex:
+                print("ros2 topic echo --once /ip failed. Proceed with caution.")
+            print("ros2 topic subscription working. Everything is working as expected.")
+ 
+    def spin_until_future_completed(self, future):
+        rclpy.spin_until_future_complete(self,future)
+        return future.result()
+
+
     # Callback Functions
     
     def scan_listener_callback(self, msg):
         self.last_scan_msg = msg
-        if DEBUG == True:
+        if Constants.DEBUG == True:
             print(f"Laserscan data recieved: Range - {msg.ranges[:5]}")
         self.scan_future.set_result(msg)
         self.scan_future.done()
         
     def imu_listener_callback(self, msg):
         self.last_imu_msg = msg
-        if DEBUG == True:
+        if Constants.DEBUG == True:
             print(f"IMU Data recieved: orientation - {msg.orientation}")
         self.imu_future.set_result(msg)
         self.imu_future.done()
@@ -103,5 +134,21 @@ class Robot(Node):
         self.battery_state_future.set_result(msg)
         self.battery_state_future.done()
 
+    def cmd_vel_timer_callback(robot):
+        if robot.cmd_vel_terminate:
+            robot.cmd_vel_future.set_result(None)
+            robot.cmd_vel_timer.cancel()
+            return
+        msg = Twist()
+        if robot.end_time<time.time():
+            robot.cmd_vel_terminate = True
+        if robot.cmd_vel_terminate and robot.cmd_vel_stop:
+            msg.linear.x = 0.
+            msg.angular.z = 0.
+        else:
+            msg.linear.x = float(robot.velocity_x)
+            msg.angular.z = float(robot.velocity_phi)
+        robot.cmd_vel_publisher.publish(msg)
+         
 
 

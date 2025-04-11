@@ -1,15 +1,17 @@
 import cv2
 import apriltag
+from .Constants import Constants
 import numpy as np
 import matplotlib.pyplot as plt
 from ultralytics import YOLO
 import rclpy
+from .Control import Control
 
 class Camera:
     @staticmethod
     def checkImage(robot):
         robot.image_future = rclpy.Future()
-        robot.spin_until_future_completed(robot.image_future)
+        robot.spin_until_future_completed( robot.image_future)
         return robot.last_image_msg
 
     @staticmethod
@@ -30,7 +32,7 @@ class Camera:
         # ^ this might have more data, test this
 
     @staticmethod
-    def estimate_apriltag_pose(self, image):
+    def estimate_apriltag_pose(robot, image):
 
         img_gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
         cv2.imshow("gray", img_gray)
@@ -42,7 +44,7 @@ class Camera:
         detections = detector.detect(img_gray)
         
 
-        if len(detections) == 0 or self.k is None:
+        if len(detections) == 0 or robot.k is None:
             return None
 
         # For simplicity, use the first detected tag.
@@ -54,7 +56,7 @@ class Camera:
         
         # Define the tag's physical corner coordinates in its own coordinate system.
         # Here the tag is centered at (0,0,0) and lies on the XY plane.
-        half_size = self.tag_size / 2.0
+        half_size = Constants.TAG_SIZE / 2.0
         object_points = np.array([
             [-half_size,  half_size, 0],
             [ half_size,  half_size, 0],
@@ -63,7 +65,7 @@ class Camera:
         ], dtype=np.float32)
         
         # Estimate the pose of the tag relative to the camera.
-        ret, rvec, tvec = cv2.solvePnP(object_points, image_points, self.k, None)
+        ret, rvec, tvec = cv2.solvePnP(object_points, image_points, robot.k, None)
         if not ret:
             print("Pose estimation failed.")
             return None
@@ -166,9 +168,9 @@ class Camera:
         return contoured, max_area ,(cX,cY)
 
     @staticmethod
-    def rosImg_to_cv2(self):
+    def rosImg_to_cv2(robot):
         #returns np array for image to be used for open cv
-        image = self.checkImage()
+        image = Camera.checkImage(robot)
         height = image.height
         width = image.width
         img_data = image.data

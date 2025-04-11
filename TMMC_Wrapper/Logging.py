@@ -1,4 +1,3 @@
-from TMMC_Wrapper import DEBUG, CONST_speed_control, is_SIM
 import time
 import subprocess
 import os

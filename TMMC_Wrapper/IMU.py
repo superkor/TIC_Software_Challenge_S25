@@ -2,7 +2,7 @@ import math
 import rclpy
 from geometry_msgs.msg import Quaternion
 import numpy as np
-from TMMC_Wrapper import DEBUG, CONST_speed_control, is_SIM
+
 class IMU:
     @staticmethod
     def checkImu(robot):

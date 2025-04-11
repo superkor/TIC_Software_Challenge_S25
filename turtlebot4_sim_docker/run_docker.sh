@@ -8,7 +8,7 @@ docker run -it --rm --net=host \
   -e DISPLAY=$DISPLAY \
   -v /tmp/.X11-unix:/tmp/.X11-unix \
   -v /dev/snd:/dev/snd \
-  -v <PUT_PATH_TO_REPO_HERE>/TIC_Software_Challenge_S25:/TIC_Software_Challenge_S25 \
+  -v /home/jack/TIC_Software_Challenge_S25:/TIC_Software_Challenge_S25 \
   -w /TIC_Software_Challenge_S25 \
   turtlebot4_test:latest \
   # You will need to change the path to your home directory in line 10

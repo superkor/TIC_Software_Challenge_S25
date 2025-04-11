@@ -9,12 +9,13 @@ if not rclpy.ok():
     rclpy.init()
 
 Constants.is_SIM = True
-if not Constants.is_SIM:
-    #specify hardware api
-    Constants.use_hardware()
-    
+
 if not "robot" in globals():
     robot = Robot()
+
+if not Constants.is_SIM:
+    #specify hardware api
+    robot.use_hardware()
 
 #debug messaging 
 print("running main")
@@ -35,6 +36,6 @@ finally:
     #when exiting program, run the kill processes
     Control.stop_keyboard_control(robot)
     robot.destroy_node()
-    rclpy.shutdown()
-
+    if rclpy.ok():
+        rclpy.shutdown()
 
