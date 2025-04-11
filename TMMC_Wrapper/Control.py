@@ -1,4 +1,4 @@
-from .Constants import Constants
+from .Robot import Robot
 from .IMU import IMU
 from irobot_create_msgs.action import Dock,Undock
 from geometry_msgs.msg import Twist
@@ -7,57 +7,57 @@ import rclpy
 import math
 import threading
 from pynput.keyboard import Listener
+from .Robot import Robot
 
-class Control:
-    def __init__(self, robot):
-        self.robot = robot
-
+class CONTROL:
+    def giveRobot(self):
+        return Robot
     def set_cmd_vel(self, velocity_x, velocity_phi, duration, stop=True):
-        self.robot.velocity_x = velocity_x
-        self.robot.velocity_phi = velocity_phi
-        self.robot.end_time = time.time() + duration
-        self.robot.cmd_vel_future = rclpy.Future()
-        self.robot.cmd_vel_stop = stop
+        Robot.velocity_x = velocity_x
+        Robot.velocity_phi = velocity_phi
+        Robot.end_time = time.time() + duration
+        Robot.cmd_vel_future = rclpy.Future()
+        Robot.cmd_vel_stop = stop
         timer_period = 0.01  # seconds
-        self.robot.cmd_vel_terminate = False
-        self.robot.cmd_vel_timer = self.robot.create_timer(timer_period, self.robot.cmd_vel_timer_callback)
-        rclpy.spin_until_future_complete(self.robot,self.robot.cmd_vel_future)  
+        Robot.cmd_vel_terminate = False
+        Robot.cmd_vel_timer = Robot.create_timer(timer_period, Robot.cmd_vel_timer_callback)
+        rclpy.spin_until_future_complete(Robot,Robot.cmd_vel_future)  
         
     def undock(self):
         # does not wait until finished
-        if not Constants.is_SIM:
+        if not Robot.is_SIM:
             action_completed_future = rclpy.Future()
             def result_cb(future):
                 result = future.result().result
                 action_completed_future.set_result(result)
                 action_completed_future.done()
-            goal_received_future = self.robot.undock_client.send_goal_async(Undock.Goal())
-            rclpy.spin_until_future_complete(self.robot,goal_received_future)
+            goal_received_future = Robot.undock_client.send_goal_async(Undock.Goal())
+            rclpy.spin_until_future_complete(Robot,goal_received_future)
             goal_handle = goal_received_future.result()
             if not goal_handle.accepted:
                 raise Exception('Goal rejected')
 
             get_result_future = goal_handle.get_result_async()
             get_result_future.add_done_callback(result_cb)
-            rclpy.spin_until_future_complete(self.robot,action_completed_future)
+            rclpy.spin_until_future_complete(Robot,action_completed_future)
             return action_completed_future.result()
         
     def dock(self):
-        if not Constants.is_SIM:
+        if not Robot.is_SIM:
             action_completed_future = rclpy.Future()
             def result_cb(future):
                 result = future.result().result
                 action_completed_future.set_result(result)
                 action_completed_future.done()
-            goal_received_future = self.robot.dock_client.send_goal_async(Dock.Goal())
-            rclpy.spin_until_future_complete(self.robot,goal_received_future)
+            goal_received_future = Robot.dock_client.send_goal_async(Dock.Goal())
+            rclpy.spin_until_future_complete(Robot,goal_received_future)
             goal_handle = goal_received_future.result()
             if not goal_handle.accepted:
                 raise Exception('Goal rejected')
 
             get_result_future = goal_handle.get_result_async()
             get_result_future.add_done_callback(result_cb)
-            rclpy.spin_until_future_complete(self.robot,action_completed_future)
+            rclpy.spin_until_future_complete(Robot,action_completed_future)
             return action_completed_future.result()
 
     def rotate(self, angle, direction):
@@ -66,7 +66,7 @@ class Control:
             Return : none
         '''
         #get the starting quaternion
-        q1 = IMU.checkImu(self.robot).orientation
+        q1 = IMU.checkImu(Robot).orientation
         #get the yaw angle in rad from the quaternion
         _,_,yaw1 = IMU.euler_from_quaternion(q1)
         #Convert to deg
@@ -78,73 +78,73 @@ class Control:
         #while the angle between the new yaw while rotating is not the desired angle rotate
         while abs(yaw2 - yaw1) <= abs(angle):
             #print(f"yaw 1: {yaw1} yaw2: {yaw2}")
-            rclpy.spin_once(self.robot, timeout_sec=0.1)
-            q2 = IMU.checkImu(self.robot).orientation
+            rclpy.spin_once(Robot, timeout_sec=0.1)
+            q2 = IMU.checkImu(Robot).orientation
             _,_,yaw2 = IMU.euler_from_quaternion(q2)
             yaw2 = math.degrees(yaw2)
-            Control.send_cmd_vel(self.robot, 0.0,direction * 0.75)
+            self.send_cmd_vel(0.0,direction * 0.75)
         #set final vel = 0
-        Control.send_cmd_vel(self.robot, 0.0,0.0)
-        if Constants.DEBUG:
+        self.send_cmd_vel(0.0,0.0)
+        if Robot.DEBUG:
             print("turn complete")
         
     def send_cmd_vel(self, linear_x, angular_z):
         msg = Twist()
         msg.linear.x = linear_x
         msg.angular.z = angular_z
-        self.robot.cmd_vel_publisher.publish(msg)
+        Robot.cmd_vel_publisher.publish(msg)
 
     def stop_keyboard_input(self):
-        self.robot.input = False
+        Robot.input = False
 
     def start_keyboard_input(self):
-        self.robot.input = True
+        Robot.input = True
 
     def start_keyboard_control(self):
-        if self.robot.keyboard_listener is None:
+        if Robot.keyboard_listener is None:
             # This set holds keys that are currently pressed.
             pressed_keys = set()
 
-            self.robot.stop_event = threading.Event()
+            Robot.stop_event = threading.Event()
 
             def update_command():
                 # Check for combined key movements first.
                 if 'w' in pressed_keys and 'a' in pressed_keys:
-                    if self.robot.input:
-                        Control.send_cmd_vel(self.robot, 0.5, 1.0)
+                    if Robot.input:
+                        self.send_cmd_vel(0.5, 1.0)
                     return
                 elif 'w' in pressed_keys and 'd' in pressed_keys:
-                    if self.robot.input:
-                        Control.send_cmd_vel(self.robot, 0.5, -1.0)
+                    if Robot.input:
+                        self.send_cmd_vel(0.5, -1.0)
                     return
                 elif 's' in pressed_keys and 'a' in pressed_keys:
-                    if self.robot.input:
-                        Control.send_cmd_vel(self.robot, -0.5, 1.0)
+                    if Robot.input:
+                        self.send_cmd_vel(-0.5, 1.0)
                     return
                 elif 's' in pressed_keys and 'd' in pressed_keys:
-                    if self.robot.input:
-                        Control.send_cmd_vel(self.robot, -0.5, -1.0)
+                    if Robot.input:
+                        self.send_cmd_vel(-0.5, -1.0)
                     return
 
                 # Process individual keys.
                 if 'w' in pressed_keys:
-                    if self.robot.input:
-                        Control.move_forward(self.robot)
+                    if Robot.input:
+                        self.move_forward()
                 elif 's' in pressed_keys:
-                    if self.robot.input:
-                        Control.move_backward(self.robot)
+                    if Robot.input:
+                        self.move_backward()
                 elif 'a' in pressed_keys:
-                    if self.robot.input:
-                        Control.turn_left(self.robot)
+                    if Robot.input:
+                        self.turn_left()
                 elif 'd' in pressed_keys:
-                    if self.robot.input:
-                        Control.turn_right(self.robot)
+                    if Robot.input:
+                        self.turn_right()
                 else:
                     # If no keys are pressed, stop the movement.
-                    Control.send_cmd_vel(self.robot, 0.0, 0.0)
+                    self.send_cmd_vel(0.0, 0.0)
 
-            def key_control_loop():
-                while not self.robot.stop_event.is_set():
+            def key_self_loop():
+                while not Robot.stop_event.is_set() and rclpy.ok():
                     update_command()
                     time.sleep(0.05)
 
@@ -166,36 +166,38 @@ class Control:
 
 
             # Start the keyboard listener.
-            self.robot.keyboard_listener = Listener(on_press=on_press, on_release=on_release)
-            self.robot.keyboard_listener.start()
+            Robot.keyboard_listener = Listener(on_press=on_press, on_release=on_release)
+            Robot.keyboard_listener.start()
             
             # Start the continuous update thread. Make sure it is a daemon thread so it doesn't block shutdown.
-            self.robot.update_thread = threading.Thread(target=key_control_loop, daemon=True)
-            self.robot.update_thread.start()
+            Robot.update_thread = threading.Thread(target=key_self_loop, daemon=True)
+            Robot.update_thread.start()
         else:
             print("Keyboard listener already running")
 
     def stop_keyboard_control(self):
-        if self.robot.keyboard_listener is not None:
-            self.robot.keyboard_listener.stop()
-            self.robot.keyboard_listener = None
+        if Robot.keyboard_listener is not None:
+            Robot.keyboard_listener.stop()
+            Robot.keyboard_listener = None
             print("Keyb list stopped")
         else: 
             print("Keyb list is not running")
 
         if hasattr(self, 'stop_event'):
-            self.robot.stop_event.set()
+            Robot.stop_event.set()
         if hasattr(self, 'update_thread'):
-            self.robot.update_thread.join()
+            Robot.update_thread.join()
 
     def move_forward(self):
-        Control.send_cmd_vel(self.robot, 1.0*Constants.CONST_speed_control, 0.0)
+        self.send_cmd_vel(1.0*Robot.CONST_speed_control, 0.0)
 
     def move_backward(self):
-        Control.send_cmd_vel(self.robot, -1.0*Constants.CONST_speed_control, 0.0)
+        self.send_cmd_vel(-1.0*Robot.CONST_speed_control, 0.0)
 
     def turn_left(self):
-        Control.send_cmd_vel(self.robot, 0.0, 1.0*Constants.CONST_speed_control)
+        self.send_cmd_vel(0.0, 1.0*Robot.CONST_speed_control)
 
     def turn_right(self):
-        Control.send_cmd_vel(self.robot, 0.0, -1.0*Constants.CONST_speed_control)
+        self.send_cmd_vel(0.0, -1.0*Robot.CONST_speed_control)
+
+Control = CONTROL()
