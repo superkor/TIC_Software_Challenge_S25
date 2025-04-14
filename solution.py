@@ -25,11 +25,11 @@ imu = IMU(robot)
 logging = Logging(robot)
 lidar = Lidar(robot)
 
-if Constants.is_SIM:
+if robot.is_SIM:
     robot.use_hardware()
 
 if challengeLevel == 1 or challengeLevel == 2:
-    Control.start_keyboard_control(robot)
+    control.start_keyboard_control(robot)
 
 
 try:
