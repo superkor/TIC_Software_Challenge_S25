@@ -59,7 +59,7 @@ Find a walkthrough of the setup process here: [https://www.youtube.com/watch?v=O
 
 To start the simulation environment, follow these steps:
 
-### 1. Download the Pre-Built Docker Image
+### 1. Set up the Docker
 
 The Dockerfile has been provided for you already. You can run it through vs Code following these steps:
 - Install Dev Containers within vscode extensions
