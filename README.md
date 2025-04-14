@@ -3,7 +3,7 @@
 ## Software Challenge Event Schedule
 |Friday, May 23| Saturday, May 24 | Sunday, May 25 |
 | --- | --- | --- |
-| 6:15-8pm: Workshop on coding practice and setup | 9am: Challenge introduction from Toyota <br> 12pm: Lunch <br> 5pm: Work period ends| ??? |
+| 6pm: Workshop on coding practice and setup time | 9am: Challenge introduction from Toyota <br> 12pm: Lunch <br> 5pm: Work period ends| 9am: Work period starts <br> 12pm: Lunch <br> 2pm: Submissions due <br> 4pm: Closing ceremony and results|
 
 ## Challenge Description
 The challenge is now live! Find the description, rubric, and presentation template at:
