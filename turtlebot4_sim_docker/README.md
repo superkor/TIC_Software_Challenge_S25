@@ -95,20 +95,6 @@ The script will:
 - Automatically execute the simulation installation script (`install_sim_files.sh`).
 - Drop you into an interactive bash shell inside the container.
 
-## Simulation Files Installation
-
-The `install_sim_files.sh` script (located in the `simulation_files` folder) performs the following tasks:
-
-- Copies `tic_field_v1.world` to the appropriate Gazebo worlds directory.
-- Copies all folders from the `models/` directory into the container’s `/root/.gazebo/models/` directory.
-
-Run this file using the following commands from the root of your repository.
-```bash
-cd simulation_files
-chmod +x install_sim_files.sh
-./install_sim_files.sh
-```
-
 ## Running the Simulation
 
 Once the sim files are installed, you can launch the simulation with the following command. Make sure that you are still inside the `simulation_files` folder.

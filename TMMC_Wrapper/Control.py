@@ -1,4 +1,3 @@
-from .Constants import Constants
 from .IMU import IMU
 from irobot_create_msgs.action import Dock,Undock
 from geometry_msgs.msg import Twist
@@ -26,7 +25,7 @@ class Control:
         
     def undock(self):
         # does not wait until finished
-        if not Constants.is_SIM:
+        if not self.robot.is_SIM:
             action_completed_future = rclpy.Future()
             def result_cb(future):
                 result = future.result().result
@@ -44,7 +43,7 @@ class Control:
             return action_completed_future.result()
         
     def dock(self):
-        if not Constants.is_SIM:
+        if not self.robot.is_SIM:
             action_completed_future = rclpy.Future()
             def result_cb(future):
                 result = future.result().result
@@ -82,7 +81,7 @@ class Control:
             rclpy.spin_once(self.robot, timeout_sec=0.1)
         
         self.send_cmd_vel(0.0, 0.0)
-        if Constants.DEBUG:
+        if self.robot.DEBUG:
             print("turn complete")
 
         
@@ -187,13 +186,13 @@ class Control:
             self.robot.update_thread.join()
 
     def move_forward(self):
-        self.send_cmd_vel(1.0*Constants.CONST_speed_control, 0.0)
+        self.send_cmd_vel(1.0*self.robot.CONST_speed_control, 0.0)
 
     def move_backward(self):
-        self.send_cmd_vel(-1.0*Constants.CONST_speed_control, 0.0)
+        self.send_cmd_vel(-1.0*self.robot.CONST_speed_control, 0.0)
 
     def turn_left(self):
-        self.send_cmd_vel(0.0, 1.0*Constants.CONST_speed_control)
+        self.send_cmd_vel(0.0, 1.0*self.robot.CONST_speed_control)
 
     def turn_right(self):
-        self.send_cmd_vel(0.0, -1.0*Constants.CONST_speed_control)
+        self.send_cmd_vel(0.0, -1.0*self.robot.CONST_speed_control)

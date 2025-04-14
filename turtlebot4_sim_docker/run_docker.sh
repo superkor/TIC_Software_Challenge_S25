@@ -15,4 +15,4 @@ docker run -it --rm --net=host \
   # You can get the path to your TIC_Software_Challenge_S25 folder by running the command:
   # readlink -f .
   # from within this repo
-bash -c "cd /simulation_files && ./install_sim_files.sh && bash"
+bash -c "cd /simulation_files && chmod +x install_sim_files.sh && ./install_sim_files.sh && bash"

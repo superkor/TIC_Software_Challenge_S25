@@ -1,4 +1,3 @@
-from .Constants import Constants
 import numpy as np
 
 class Lidar:
@@ -40,7 +39,7 @@ class Lidar:
             return -1,-1
         
 
-        if Constants.is_SIM:
+        if self.robot.is_SIM:
             left = center + offset_angle
             right = center - offset_angle
 
