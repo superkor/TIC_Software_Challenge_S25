@@ -61,39 +61,33 @@ To start the simulation environment, follow these steps:
 
 ### 1. Download the Pre-Built Docker Image
 
-The Dockerfile has been provided for you already. You can build it using the following commands
-```
-cd TIC_Software_Challenge_S25/turtlebot4_sim_docker
-```
-```bash
-sudo docker build -t turtlebot4_test:latest .
-```
+The Dockerfile has been provided for you already. You can run it through vs Code following these steps:
+- Install Dev Containers within vscode extensions
 
-### 2. Run the Provided Wrapper Script
+- Go into terminal and type:
+  ```bash
+  sudo usermod -aG docker $USER
+  ```
+- Restart the VM by clicking player in the top left then power.
 
-The `run_docker.sh` script handles all the necessary configuration for display, audio, and mounting your simulation files. 
+- Once the VM has restarted open the terminal and type groups making sure docker is there:
+  ```bash
+  groups
+  ```
 
-### You will need to update the paths within that file, open it up in VSCode and make the changes to line 10 as specified in the comments of the file.**
+- Then in the same terminal type:
+  ```bash
+  xhost +local:root
+  ```
+### 2. Run the Docker through vs code
 
-Once this is done, run the file using the following command:
+- Open VS code and type ctrl + shift + p
 
-```bash
-sudo ./run_docker.sh
-```
+- Then type in the search bar "Dev Containers: Rebuild and Reopen in Container: 
 
-If this command fails with the message "sudo: ./run_docker command not found", run the following commands to update the permissions of the files you want to run.
+- Now your code and terminal commands within vs code will run through the docker.
 
-```bash
-chmod +x run_docker.sh
-```
-
-The script will:
-
-- Allow local connections to the X server.
-- Mount your host’s X11 socket and audio devices.
-- Mount your local `Documents` directory and the `simulation_files` folder.
-- Automatically execute the simulation installation script (`install_sim_files.sh`).
-- Drop you into an interactive bash shell inside the container.
+- If you ever want to exit vs code from the docker type ctrl + shift + p and type in the search bar "Dev Containers: Reopen Folder Locally"
 
 ## Running the Simulation
 
