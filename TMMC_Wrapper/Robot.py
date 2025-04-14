@@ -14,6 +14,8 @@ import numpy as np
 import os
 import subprocess
 import time
+import rclpy.qos
+from copy import copy
 
 class Robot(Node):
     def __init__(self):
