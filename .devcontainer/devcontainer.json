@@ -1,0 +1,26 @@
+{
+    "name": "Turtlebot4 Simulation Environment",
+    "dockerFile": "../turtlebot4_sim_docker/Dockerfile",
+    "context": "..",
+    "runArgs": [
+        "--net=host",
+        "--cap-add=NET_ADMIN",
+        "--device=/dev/net/tun",
+        "-e", "DISPLAY=${localEnv:DISPLAY}",
+        "-e", "XAUTHORITY=/root/.Xauthority",
+        "-v", "/tmp/.X11-unix:/tmp/.X11-unix",
+        "-v", "/dev/snd:/dev/snd",
+        "-v", "${env:HOME}/.Xauthority:/root/.Xauthority:ro"
+    ],
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "ms-python.python"
+            ],
+            "settings": {
+                "python.pythonPath": "/usr/bin/python3"
+            }
+        }
+    },
+    "postStartCommand": "cd simulation_files && chmod +x install_sim_files.sh && ./install_sim_files.sh && cd .. && cd robohub/rendezvous_vpn && chmod +x vpn.sh && chmod +x turtlebot-tap-up.sh"
+}
