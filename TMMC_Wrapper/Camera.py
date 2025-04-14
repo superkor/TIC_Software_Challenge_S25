@@ -1,22 +1,25 @@
 import cv2
 import apriltag
-from .Robot import Robot
+from .Constants import Constants
 import numpy as np
-import matplotlib.pyplot as plt
-from ultralytics import YOLO
 import rclpy
-from .Control import Control
 
 class Camera:
-    @staticmethod
-    def checkImage(robot):
-        robot.image_future = rclpy.Future()
-        robot.spin_until_future_completed( robot.image_future)
-        return robot.last_image_msg
+    def __init__(self, robot):
+        self.robot = robot
 
-    @staticmethod
-    def checkImageRelease(robot): #this one returns an actual image instead of all the data
-        image = robot.checkImage()
+    def checkImage(self):
+        self.robot.image_future = rclpy.Future()
+        try:
+            self.robot.spin_until_future_completed(self.robot.image_future)
+        except Exception as e:
+            # Log the exception and return None when the node is shutting down or a KeyboardInterrupt occurs.
+            print("Exception in checkImage:", e)
+            return None
+        return self.robot.last_image_msg
+
+    def checkImageRelease(self): #this one returns an actual image instead of all the data
+        image = self.robot.checkImage()
         height = image.height
         width = image.width
         img_data = image.data
@@ -24,15 +27,12 @@ class Camera:
         cv2.imshow("image", img_3D)
         cv2.waitKey(10)
 
-    @staticmethod
-    def checkCamera(robot):
-        robot.camera_info_future = rclpy.Future()
-        robot.spin_until_future_completed(robot.camera_info_future)
-        return robot.last_camera_info_msg 
-        # ^ this might have more data, test this
+    def checkCamera(self):
+        self.robot.camera_info_future = rclpy.Future()
+        self.robot.spin_until_future_completed(self.robot.camera_info_future)
+        return self.robot.last_camera_info_msg 
 
-    @staticmethod
-    def estimate_apriltag_pose(robot, image):
+    def estimate_apriltag_pose(self, image):
 
         img_gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
         cv2.imshow("gray", img_gray)
@@ -44,7 +44,7 @@ class Camera:
         detections = detector.detect(img_gray)
         
 
-        if len(detections) == 0 or robot.k is None:
+        if len(detections) == 0 or self.robot.k is None:
             return None
 
         # For simplicity, use the first detected tag.
@@ -56,7 +56,7 @@ class Camera:
         
         # Define the tag's physical corner coordinates in its own coordinate system.
         # Here the tag is centered at (0,0,0) and lies on the XY plane.
-        half_size = Robot.TAG_SIZE / 2.0
+        half_size = Constants.TAG_SIZE / 2.0
         object_points = np.array([
             [-half_size,  half_size, 0],
             [ half_size,  half_size, 0],
@@ -65,7 +65,7 @@ class Camera:
         ], dtype=np.float32)
         
         # Estimate the pose of the tag relative to the camera.
-        ret, rvec, tvec = cv2.solvePnP(object_points, image_points, robot.k, None)
+        ret, rvec, tvec = cv2.solvePnP(object_points, image_points, self.robot.k, None)
         if not ret:
             print("Pose estimation failed.")
             return None
@@ -83,6 +83,50 @@ class Camera:
         elevation = np.degrees(np.arctan2(tvec[1], tvec[2]))
         
         return tag_id, range_, bearing, elevation
+    
+    def rosImg_to_cv2(self):
+        image = self.checkImage()
+        if image is None:
+            # Gracefully handle the case when no image was received.
+            return None
+        height = image.height
+        width = image.width
+        img_data = image.data
+        img_3D = np.reshape(img_data, (height, width, 3))
+        return img_3D
+
+    def ML_predict_stop_sign(self, model, img):
+        # height, width = image.shape[:2]
+        # imgsz = (width, height)
+
+        stop_sign_detected = False
+
+        x1 = -1
+        y1 = -1 
+        x2 = -1 
+        y2 = -1
+
+        # Predict stop signs in image using model
+        results = model.predict(img, classes=[11], conf=0.25, imgsz=640, max_det=1)
+        
+        # Results is a list containing the results object with all data
+        results_obj = results[0]
+        
+        # Extract bounding boxes
+        boxes = results_obj.boxes.xyxy
+
+        try:
+            for box in boxes:
+                x1, y1, x2, y2 = map(int, box[:4])
+                cv2.rectangle(img, (x1, y1), (x2, y2), (0, 255, 0), 3)
+                stop_sign_detected = True
+        except:
+            stop_sign_detected = False
+
+        cv2.imshow("Bounding Box", img)
+
+        return stop_sign_detected, x1, y1, x2, y2   
+    
 
     @staticmethod
     def red_filter(img):
@@ -132,80 +176,31 @@ class Camera:
 
     @staticmethod
     def add_contour(img):
-        """
-        apply contour detection to the red only masked image
-        :param img: list image array
-        :return: contoured img, max area and centroid(cy,cx)
-        """
-        max_area = 0    # stores the largest red area detected
-        #edges = cv2.Canny(img, 100, 200)
+        max_area = 0    
         contours, _ = cv2.findContours(img, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-
-
-        #loop through and get the area of all contours
-        areas_of_contours = [cv2.contourArea(contour) for contour in contours]
-        contoured = np.zeros((img.shape[0], img.shape[1], 3), dtype = np.uint8)
-
+        contoured = np.zeros((img.shape[0], img.shape[1], 3), dtype=np.uint8)
+        cX, cY = 0, 0  # Default centroid coordinates in case processing fails.
         try:
+            areas_of_contours = [cv2.contourArea(contour) for contour in contours]
             max_poly_indx = np.argmax(areas_of_contours)
             stop_sign = contours[max_poly_indx]
-            #approximate contour into a simpler shape
             epsilon = 0.01 * cv2.arcLength(stop_sign, True)
             approx_polygon = cv2.approxPolyDP(stop_sign, epsilon, True)
             area = cv2.contourArea(approx_polygon)
             max_area = max(max_area, area)
             cv2.drawContours(contoured, [approx_polygon], -1, (0, 255, 0), 3)
 
-            # compute the center of the contour
             M = cv2.moments(stop_sign)
-            cX = int(M["m10"] / M["m00"])
-            cY = int(M["m01"] / M["m00"])
-            # draw the contour and center of the shape on the image
-            cv2.circle(contoured, (cX, cY), 2, (255, 255, 255), -1)
-        except:
-            x=1
+            if M["m00"] != 0:  # Check to avoid division by zero
+                cX = int(M["m10"] / M["m00"])
+                cY = int(M["m01"] / M["m00"])
+                cv2.circle(contoured, (cX, cY), 2, (255, 255, 255), -1)
+            else:
+                # Define alternative behavior if contour area is zero.
+                cX, cY = -1, -1
+        except Exception as e:
+            # Optionally log the error e for debugging.
+            # Return default values if an error occurs.
+            cX, cY = -1, -1
 
-        return contoured, max_area ,(cX,cY)
-
-    @staticmethod
-    def rosImg_to_cv2(robot):
-        #returns np array for image to be used for open cv
-        image = Camera.checkImage(robot)
-        height = image.height
-        width = image.width
-        img_data = image.data
-        img_3D = np.reshape(img_data, (height, width, 3))
-        return img_3D
-
-    @staticmethod
-    def ML_predict_stop_sign(model, img):
-        # height, width = image.shape[:2]
-        # imgsz = (width, height)
-
-        stop_sign_detected = False
-
-        x1 = -1
-        y1 = -1 
-        x2 = -1 
-        y2 = -1
-
-        # Predict stop signs in image using model
-        results = model.predict(img, classes=[11], conf=0.25, imgsz=640, max_det=1)
-        
-        # Results is a list containing the results object with all data
-        results_obj = results[0]
-        
-        # Extract bounding boxes
-        boxes = results_obj.boxes.xyxy
-
-        try:
-            for box in boxes:
-                x1, y1, x2, y2 = map(int, box[:4])
-                cv2.rectangle(img, (x1, y1), (x2, y2), (0, 255, 0), 3)
-                stop_sign_detected = True
-        except:
-            stop_sign_detected = False
-
-        cv2.imshow("Bounding Box", img)
-
-        return stop_sign_detected, x1, y1, x2, y2   
+        return contoured, max_area, (cX, cY)
