@@ -107,13 +107,6 @@ To run the script to connect to the turtlebot, make sure you are inside the dock
 cd robohub/rendezvous_vpn
 ```
 
-You will need to update the permissions of two files with the following commands.
-
-```bash
-chmod +x vpn.sh
-chmod +x turtlebot-tap-up.sh
-```
-
 Then connect to the robot by running the following script, replacing the <NUMBER_OF_TURTLEBOT> with the number on the sticker of the turtlebot you wish to use:
 ```bash
 sudo ./vpn.sh <NUMBER_OF_TURTLEBOT>
@@ -125,16 +118,6 @@ Tunnel ready
 Stopping this process will terminate the VPN
 Don't forget to restart the ros2 daemon if necessary
 ```
-
-## Important Note
-If you start a new terminal and want to reconnect to a docker container that is already running, do not run `run_docker.sh`. This will create a new container instance, causing ROS2 nodes to be unable to communicate with each other. Instead, use the following commands to open another terminal inside the same running container:
-
-```bash
-sudo docker ps   # Find the Container ID
-sudo docker exec -it <ContainerID> bash
-```
-You will need to do this if you want to run Python files while a simulation or connection is running.
-
 
 ## Controlling the TurtleBot with Code
 To control your turtlebot in either the simulation or using a physical robot with a python file, simply open up the docker container command line (see the note above if you are doing this with the sim) and enter:
