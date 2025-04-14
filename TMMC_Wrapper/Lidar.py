@@ -1,14 +1,15 @@
-from .Robot import Robot
+from .Constants import Constants
 import numpy as np
 
 class Lidar:
-    @staticmethod
-    def checkScan(robot):
-        robot.spin_until_future_completed(robot.scan_future)
-        return robot.last_scan_msg
+    def __init__(self, robot):
+        self.robot = robot
 
-    @staticmethod
-    def lidar_data_too_close(scan, th1, th2, min_dist):
+    def checkScan(self):
+        self.robot.spin_until_future_completed(self.robot.scan_future)
+        return self.robot.last_scan_msg
+
+    def lidar_data_too_close(self, scan, th1, th2, min_dist):
         #returns points between angles th1, th2 that are closer tha min_dist
         if th2 < th1:
             temp = th1
@@ -31,8 +32,7 @@ class Lidar:
 
         return float(num_too_close) / total
 
-    @staticmethod
-    def detect_obstacle_in_cone(scan, distance, center, offset_angle):
+    def detect_obstacle_in_cone(self, scan, distance, center, offset_angle):
         obstacle_dist = distance
 
         if scan is None:
@@ -40,7 +40,7 @@ class Lidar:
             return -1,-1
         
 
-        if Robot.is_SIM:
+        if Constants.is_SIM:
             left = center + offset_angle
             right = center - offset_angle
 
@@ -108,10 +108,9 @@ class Lidar:
         return -1, -1
 
 
-    @staticmethod
-    def test_lidar_orientation(robot):
+    def test_lidar_orientation(self):
         #---this was used to find the front heading of the robot, should not be used in solutions
-        ranges = robot.last_scan_msg.ranges
+        ranges = self.robot.last_scan_msg.ranges
         num_ranges = len(ranges)
         quarter_segment = num_ranges // 4
         degrees_per_range = 360 / num_ranges
