@@ -1,4 +1,4 @@
-from TMMC_Wrapper import Constants, Robot, Battery, Camera, IMU, Lidar, Logging, Control
+from TMMC_Wrapper import *
 import rclpy
 import numpy as np
 import math
@@ -7,8 +7,6 @@ from ultralytics import YOLO
 
 # Set to True for simulation mode (or hardware, as needed)
 Constants.is_SIM = True
-if not Constants.is_SIM:
-    Constants.use_hardware()
 
 # Set to the level of which challenge you are attempting
 challengeLevel = 1
@@ -16,14 +14,23 @@ challengeLevel = 1
 # Initialize ROS2 if not already running
 if not rclpy.ok():
     rclpy.init()
-robot = Robot()
+
+if not "robot" in globals():
+    robot = Robot()
+
+control = Control(robot)
+battery = Battery(robot)
+camera = Camera(robot)
+imu = IMU(robot)
+logging = Logging(robot)
+lidar = Lidar(robot)
+
+if Constants.is_SIM:
+    robot.use_hardware()
 
 if challengeLevel == 1 or challengeLevel == 2:
     Control.start_keyboard_control(robot)
 
-# Declare your own functions here:
-
-#----------------------------------------------------
 
 try:
     if challengeLevel == 1:
