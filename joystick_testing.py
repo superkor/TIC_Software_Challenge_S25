@@ -6,7 +6,7 @@ import rclpy
 if not rclpy.ok():
     rclpy.init()
 
-Constants.is_SIM = True
+is_SIM = True
 
 if not "robot" in globals():
     robot = Robot(is_SIM = is_SIM)
