@@ -15,8 +15,8 @@ challengeLevel = 1
 if not rclpy.ok():
     rclpy.init()
 
-if robot.is_SIM:
-    robot.use_hardware()
+if Constants.is_SIM:
+    Robot.use_hardware()
 
 if not "robot" in globals():
     robot = Robot()
