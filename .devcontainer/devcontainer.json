@@ -4,6 +4,7 @@
     "context": "..",
     "runArgs": [
         "--net=host",
+        "--privileged",
         "--cap-add=NET_ADMIN",
         "--device=/dev/net/tun",
         "-e", "DISPLAY=${localEnv:DISPLAY}",
@@ -12,6 +13,9 @@
         "-v", "/dev/snd:/dev/snd",
         "-v", "${env:HOME}/.Xauthority:/root/.Xauthority:ro"
     ],
+    "containerEnv": {
+        "ROS_DOMAIN_ID": "2"
+    },
     "customizations": {
         "vscode": {
             "extensions": [
