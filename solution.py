@@ -5,17 +5,14 @@ import math
 import time
 from ultralytics import YOLO
 
-# Set to True for simulation mode (or hardware, as needed)
-Constants.is_SIM = True
-
-# Set to the level of which challenge you are attempting
 challengeLevel = 1
+Constants.is_SIM = False
 
-# Initialize ROS2 if not already running
 if not rclpy.ok():
     rclpy.init()
 
-if Constants.is_SIM:
+
+if not Constants.is_SIM:
     Robot.use_hardware()
 
 if not "robot" in globals():
@@ -29,7 +26,9 @@ logging = Logging(robot)
 lidar = Lidar(robot)
 
 if challengeLevel == 1 or challengeLevel == 2:
-    control.start_keyboard_control(robot)
+    control.start_keyboard_control()
+    rclpy.spin_once(robot, timeout_sec=0.1)
+
 
 
 try:
