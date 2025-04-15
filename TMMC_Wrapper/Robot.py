@@ -22,7 +22,7 @@ class Robot(Node):
         self.DEBUG = DEBUG #set to false to disable terminal printing of some functions
         self.is_SIM = is_SIM #to disable some functions that can not be used on the sim
         self.TAG_SIZE = TAG_SIZE # Size of april tags
-        # super().__init__('notebook_wrapper')
+        super().__init__('notebook_wrapper')
         # Create custom qos profile to make subscribers time out faster once notebook
         qos_profile_sensor_data = copy(rclpy.qos.qos_profile_sensor_data)
         qos_policy = copy(rclpy.qos.qos_profile_sensor_data)
