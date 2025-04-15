@@ -6,10 +6,14 @@ import rclpy
 if not rclpy.ok():
     rclpy.init()
 
-is_SIM = True
+Constants.is_SIM = False
+
+if not Constants.is_SIM:
+    #specify hardware api
+    Robot.use_hardware()
 
 if not "robot" in globals():
-    robot = Robot(is_SIM = is_SIM)
+    robot = Robot()
 
 control = Control(robot)
 battery = Battery(robot)
@@ -17,10 +21,6 @@ camera = Camera(robot)
 imu = IMU(robot)
 logging = Logging(robot)
 lidar = Lidar(robot)
-
-if not robot.is_SIM:
-    #specify hardware api
-    robot.use_hardware()
 
 #debug messaging 
 print("running main")
@@ -43,4 +43,3 @@ finally:
     robot.destroy_node()
     if rclpy.ok():
         rclpy.shutdown()
-
