@@ -6,7 +6,7 @@ import time
 from ultralytics import YOLO
 
 # Set to True for simulation mode (or hardware, as needed)
-is_SIM = True
+Constants.is_SIM = True
 
 # Set to the level of which challenge you are attempting
 challengeLevel = 1
@@ -15,8 +15,11 @@ challengeLevel = 1
 if not rclpy.ok():
     rclpy.init()
 
+if robot.is_SIM:
+    robot.use_hardware()
+
 if not "robot" in globals():
-    robot = Robot(is_SIM=is_SIM)
+    robot = Robot()
 
 control = Control(robot)
 battery = Battery(robot)
@@ -24,9 +27,6 @@ camera = Camera(robot)
 imu = IMU(robot)
 logging = Logging(robot)
 lidar = Lidar(robot)
-
-if robot.is_SIM:
-    robot.use_hardware()
 
 if challengeLevel == 1 or challengeLevel == 2:
     control.start_keyboard_control(robot)
