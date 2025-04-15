@@ -6,17 +6,14 @@ import time
 from ultralytics import YOLO
 
 challengeLevel = 1
-Constants.is_SIM = False
+is_SIM = True
+Debug = False
 
 if not rclpy.ok():
     rclpy.init()
 
-
-if not Constants.is_SIM:
-    Robot.use_hardware()
-
 if not "robot" in globals():
-    robot = Robot()
+    robot = Robot(IS_SIM=is_SIM, DEBUG=Debug)
 
 control = Control(robot)
 battery = Battery(robot)
