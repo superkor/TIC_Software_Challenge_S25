@@ -15,10 +15,15 @@ import subprocess
 import time
 import rclpy.qos
 from copy import copy
-from .Constants import Constants
 
 class Robot(Node):
-    def __init__(self):
+    def __init__(self, IS_SIM = True, DEBUG = False, TAG_SIZE = 0.25, CONST_speed_control = 1):
+        # Set constants 
+        self.IS_SIM = IS_SIM
+        self.DEBUG = DEBUG
+        self.TAG_SIZE = TAG_SIZE
+        self.CONST_speed_control = CONST_speed_control
+        self.use_hardware()
         super().__init__('notebook_wrapper')
         # Create custom qos profile to make subscribers time out faster once notebook
         qos_profile_sensor_data = copy(rclpy.qos.qos_profile_sensor_data)
@@ -38,14 +43,14 @@ class Robot(Node):
         self.imu_subscription  # prevent unused variable warning
         
         self.image_future = rclpy.Future()
-        if Constants.is_SIM:
+        if self.IS_SIM:
             self.image_subscription = self.create_subscription(Image,'/camera/image_raw',self.image_listener_callback,qos_profile_sensor_data)
         else:
             self.image_subscription = self.create_subscription(Image,'/oakd/rgb/preview/image_raw',self.image_listener_callback,qos_profile_sensor_data)
         self.image_subscription  # prevent unused variable warning
 
         self.camera_info_future = rclpy.Future()
-        if Constants.is_SIM:
+        if self.IS_SIM:
             self.camera_info_subscription = self.create_subscription(CameraInfo,'/camera/camera_info',self.camera_info_listener_callback,qos_profile_sensor_data)
         else:
             self.camera_info_subscription = self.create_subscription(CameraInfo,'oakd/rgb/preview/camera_info',self.camera_info_listener_callback,qos_profile_sensor_data)
@@ -55,7 +60,7 @@ class Robot(Node):
         self.battery_state_subscription = self.create_subscription(BatteryState,'/battery_state',self.battery_state_listener_callback,qos_profile_sensor_data)
         self.battery_state_subscription  # prevent unused variable warning
 
-        if (not(Constants.is_SIM)): 
+        if (not(self.IS_SIM)): 
             self.dock_client = ActionClient(self, Dock, '/dock')
             self.undock_client = ActionClient(self, Undock, '/undock')
             self.dock_client.wait_for_server()
@@ -74,9 +79,8 @@ class Robot(Node):
         self.k = None
 
 
-    @staticmethod
-    def use_hardware():
-        if not Constants.is_SIM:
+    def use_hardware(self):
+        if not self.IS_SIM:
             # import ROS settings for working locally or with the robot (equivalent of ros_local/ros_robot in the shell)
             env_file = ".env_ros_robot"
             os.environ.update(dict([l.strip().split("=") for l in filter(lambda x: len(x.strip())>0,open(env_file).readlines())]))
@@ -106,14 +110,14 @@ class Robot(Node):
     
     def scan_listener_callback(self, msg):
         self.last_scan_msg = msg
-        if Constants.DEBUG == True:
+        if self.DEBUG == True:
             print(f"Laserscan data recieved: Range - {msg.ranges[:5]}")
         self.scan_future.set_result(msg)
         self.scan_future.done()
         
     def imu_listener_callback(self, msg):
         self.last_imu_msg = msg
-        if Constants.DEBUG == True:
+        if self.DEBUG == True:
             print(f"IMU Data recieved: orientation - {msg.orientation}")
         self.imu_future.set_result(msg)
         self.imu_future.done()

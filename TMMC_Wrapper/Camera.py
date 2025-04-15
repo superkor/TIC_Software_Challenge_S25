@@ -2,7 +2,6 @@ import cv2
 import apriltag
 import numpy as np
 import rclpy
-from .Constants import Constants
 
 class Camera:
     def __init__(self, robot):
@@ -56,7 +55,7 @@ class Camera:
         
         # Define the tag's physical corner coordinates in its own coordinate system.
         # Here the tag is centered at (0,0,0) and lies on the XY plane.
-        half_size = Constants.TAG_SIZE / 2.0
+        half_size = self.robot.TAG_SIZE / 2.0
         object_points = np.array([
             [-half_size,  half_size, 0],
             [ half_size,  half_size, 0],
