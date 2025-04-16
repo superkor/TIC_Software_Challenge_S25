@@ -138,19 +138,3 @@ class Robot(Node):
         self.last_battery_state_msg = msg
         self.battery_state_future.set_result(msg)
         self.battery_state_future.done()
-
-    def cmd_vel_timer_callback(robot):
-        if robot.cmd_vel_terminate:
-            robot.cmd_vel_future.set_result(None)
-            robot.cmd_vel_timer.cancel()
-            return
-        msg = Twist()
-        if robot.end_time<time.time():
-            robot.cmd_vel_terminate = True
-        if robot.cmd_vel_terminate and robot.cmd_vel_stop:
-            msg.linear.x = 0.
-            msg.angular.z = 0.
-        else:
-            msg.linear.x = float(robot.velocity_x)
-            msg.angular.z = float(robot.velocity_phi)
-        robot.cmd_vel_publisher.publish(msg)
