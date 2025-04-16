@@ -32,29 +32,19 @@ class Camera:
         return self.robot.last_camera_info_msg 
 
     def estimate_apriltag_pose(self, image):
-
+        """
+        Detects all AprilTags in the image and returns a list of tuples:
+        (tag_id, range, bearing, elevation) for each detected tag.
+        """
+        # Convert image to grayscale for tag detection
         img_gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-        cv2.imshow("gray", img_gray)
-        cv2.waitKey(1)  # Add a small delay so the window can update
-        
-        # Set up AprilTag detector options; adjust families as needed.
-        options = apriltag.DetectorOptions(families="tag16h5, tag25h9")
-        detector = apriltag.Detector(options)
-        detections = detector.detect(img_gray)
-        
+        detections = apriltag.Detector(apriltag.DetectorOptions(families="tag16h5, tag25h9")).detect(img_gray)
 
-        if len(detections) == 0 or self.robot.k is None:
-            return None
+        # If camera calibration matrix is not available or no detections, return empty list
+        if not detections or self.robot.k is None:
+            return []
 
-        # For simplicity, use the first detected tag.
-        detection = detections[0]
-        tag_id = detection.tag_id
-        
-        # Extract the image coordinates of the tag's four corners.
-        image_points = np.array(detection.corners, dtype=np.float32)
-        
-        # Define the tag's physical corner coordinates in its own coordinate system.
-        # Here the tag is centered at (0,0,0) and lies on the XY plane.
+        poses = []
         half_size = self.robot.TAG_SIZE / 2.0
         object_points = np.array([
             [-half_size,  half_size, 0],
@@ -62,26 +52,25 @@ class Camera:
             [ half_size, -half_size, 0],
             [-half_size, -half_size, 0]
         ], dtype=np.float32)
-        
-        # Estimate the pose of the tag relative to the camera.
-        ret, rvec, tvec = cv2.solvePnP(object_points, image_points, self.robot.k, None)
-        if not ret:
-            print("Pose estimation failed.")
-            return None
 
-        # Flatten tvec for simpler processing.
-        tvec = tvec.flatten()
-        
-        # Compute the range (Euclidean distance).
-        range_ = np.linalg.norm(tvec)
-        
-        # Calculate the bearing and elevation (in degrees) relative to the camera's forward axis.
-        # For a typical camera coordinate system:
-        #   - x axis: right, y axis: down, z axis: forward.
-        bearing = np.degrees(np.arctan2(tvec[0], tvec[2]))
-        elevation = np.degrees(np.arctan2(tvec[1], tvec[2]))
-        
-        return tag_id, range_, bearing, elevation
+        # Process each detected tag
+        for detection in detections:
+            tag_id = detection.tag_id
+            image_points = np.array(detection.corners, dtype=np.float32)
+
+            # Estimate pose
+            ret, rvec, tvec = cv2.solvePnP(object_points, image_points, self.robot.k, None)
+            if not ret:
+                continue
+
+            tvec = tvec.flatten()
+            range_ = np.linalg.norm(tvec)
+            bearing = np.degrees(np.arctan2(tvec[0], tvec[2]))
+            elevation = np.degrees(np.arctan2(tvec[1], tvec[2]))
+
+            poses.append((tag_id, range_, bearing, elevation))
+
+        return poses
     
     def rosImg_to_cv2(self):
         image = self.checkImage()
