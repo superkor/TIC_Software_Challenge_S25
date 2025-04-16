@@ -14,6 +14,7 @@ RUN apt-get update && apt-get install -y \
     ros-humble-turtlebot3* \
     ros-humble-rmw-fastrtps-cpp \
     ros-humble-irobot-create-msgs \
+    openvpn \
  && rm -rf /var/lib/apt/lists/*
 
 # Install additional Python packages using pip3
