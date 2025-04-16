@@ -18,16 +18,31 @@ class Control:
         self.robot = robot
         self.imu = IMU(self.robot)
 
-    def set_cmd_vel(self, velocity_x, velocity_phi, duration, stop=True):
-        self.robot.velocity_x = velocity_x
-        self.robot.velocity_phi = velocity_phi
-        self.robot.end_time = time.time() + duration
-        self.robot.cmd_vel_future = rclpy.Future()
-        self.robot.cmd_vel_stop = stop
+    def set_cmd_vel(self, velocity_x, velocity_phi, duration):
+        self.velocity_x = velocity_x
+        self.velocity_phi = velocity_phi
+        self.end_time = time.time() + duration
+        self.cmd_vel_future = rclpy.Future()
         timer_period = 0.01  # seconds
-        self.robot.cmd_vel_terminate = False
-        self.robot.cmd_vel_timer = self.robot.create_timer(timer_period, self.robot.cmd_vel_timer_callback)
-        rclpy.spin_until_future_complete(self.robot,self.robot.cmd_vel_future)  
+        self.cmd_vel_terminate = False
+        self.cmd_vel_timer = self.robot.create_timer(timer_period, self.cmd_vel_timer_callback)
+        rclpy.spin_until_future_complete(self.robot,self.cmd_vel_future)  
+
+    def cmd_vel_timer_callback(self):
+        if self.cmd_vel_terminate:
+            self.cmd_vel_future.set_result(None)
+            self.cmd_vel_timer.cancel()
+            return
+        msg = Twist()
+        if self.end_time<time.time():
+            self.cmd_vel_terminate = True
+        if self.cmd_vel_terminate:
+            msg.linear.x = 0.
+            msg.angular.z = 0.
+        else:
+            msg.linear.x = float(self.velocity_x)
+            msg.angular.z = float(self.velocity_phi)
+        self.robot.cmd_vel_publisher.publish(msg)
         
     def undock(self):
         # does not wait until finished
