@@ -6,14 +6,10 @@ import rclpy
 if not rclpy.ok():
     rclpy.init()
 
-Constants.is_SIM = False
 
-if not Constants.is_SIM:
-    #specify hardware api
-    Robot.use_hardware()
 
 if not "robot" in globals():
-    robot = Robot()
+    robot = Robot(is_SIM = False)
 
 control = Control(robot)
 battery = Battery(robot)
