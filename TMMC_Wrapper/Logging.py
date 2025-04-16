@@ -26,7 +26,7 @@ class Logging:
         del self.robot.logging_instance
         return self.robot.logging_dir
             
-    def get_logging_data(logging_dir):
+    def get_logging_data(self, logging_dir):
         reader = rosbag2_py.SequentialReader()
         storage_options = rosbag2_py.StorageOptions(uri=logging_dir,storage_id='mcap')
         converter_options = rosbag2_py.ConverterOptions('','')
@@ -43,6 +43,6 @@ class Logging:
             log_content[topic].append((t,msg))
         return log_content
 
-    def delete_logging_data(logging_dir):
+    def delete_logging_data(self, logging_dir):
         import shutil
         shutil.rmtree(logging_dir)
