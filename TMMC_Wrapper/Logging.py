@@ -4,6 +4,7 @@ import os
 import rosbag2_py
 from rosidl_runtime_py.utilities import get_message
 from rclpy.serialization import deserialize_message
+import shutil
 
 class Logging:
     def __init__(self, robot):
@@ -44,5 +45,4 @@ class Logging:
         return log_content
 
     def delete_logging_data(self, logging_dir):
-        import shutil
         shutil.rmtree(logging_dir)
