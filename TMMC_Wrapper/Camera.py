@@ -45,7 +45,8 @@ class Camera:
         # If camera calibration matrix is not available or no detections, return empty list
         if not detections or self.robot.k is None:
             return []
-
+        
+        
         poses = []
         half_size = self.robot.TAG_SIZE / 2.0
         object_points = np.array([
@@ -60,7 +61,7 @@ class Camera:
             tag_id = detection.tag_id
             image_points = np.array(detection.corners, dtype=np.float32)
 
-            # Estimate pose
+            # Estimate position
             ret, rvec, tvec = cv2.solvePnP(object_points, image_points, self.robot.k, None)
             if not ret:
                 continue

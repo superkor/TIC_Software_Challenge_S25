@@ -19,8 +19,12 @@ class Lidar:
             print("Warning: No LIDAR Data")
             return -1,-1
         
-
+        # Need to seperate the logic for simulation and real robot
+        # because the angles are different in the two cases.
+        # In simulation, the angles are in degrees and range from 0 to 360.
+        # In the real robot, the angles are in degrees and range from 0 to 720.
         if self.robot.IS_SIM:
+            # Find the relevent range
             left = center + offset_angle
             right = center - offset_angle
 
@@ -29,6 +33,7 @@ class Lidar:
             if left >= 360:
                 left = left - 360
 
+            # Get the smallest distance in the relevent range
             if right > left:
                 relevent_1 = scan.ranges[0:(left + 1)]
                 relevent_2 = scan.ranges[right: 360]
@@ -47,6 +52,7 @@ class Lidar:
                 min_dist_index = relevent_range.index(min_dist)
                 min_dist_angle = min_dist_index + right
         else:
+            # Find the relevent range
             new_center = center + 180
 
             if new_center >= 720:
@@ -60,7 +66,8 @@ class Lidar:
 
             if right < 0:
                 right = right + 720
-
+            
+            # Get the smallest distance in the relevent range
             if right > left:
                 relevent_1 = scan.ranges[0:(left + 1)]
                 relevent_2 = scan.ranges[right: 720]
@@ -85,4 +92,5 @@ class Lidar:
         if min_dist <= obstacle_dist:
             return min_dist, min_dist_angle
         
+        # If no obstacle is detected, return -1 for both distance and angle
         return -1, -1
