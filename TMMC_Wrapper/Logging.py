@@ -5,6 +5,7 @@ import rosbag2_py
 from rosidl_runtime_py.utilities import get_message
 from rclpy.serialization import deserialize_message
 import shutil
+import signal
 
 class Logging:
     def __init__(self, robot):
@@ -21,7 +22,6 @@ class Logging:
         time.sleep(5)
         
     def stop_logging(self):
-        import signal
         os.killpg(os.getpgid(self.robot.logging_instance.pid), signal.SIGINT)
         self.robot.logging_instance.wait()
         del self.robot.logging_instance
