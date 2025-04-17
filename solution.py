@@ -21,7 +21,12 @@ if not rclpy.ok():
 if not "robot" in globals():
     robot = Robot(IS_SIM=is_SIM, DEBUG=Debug)
     
-initializeModules(robot)
+control = Control(robot)
+battery = Battery(robot)
+camera = Camera(robot)
+imu = IMU(robot)
+logging = Logging(robot)
+lidar = Lidar(robot)
 
 if challengeLevel <= 2:
     control.start_keyboard_control()
