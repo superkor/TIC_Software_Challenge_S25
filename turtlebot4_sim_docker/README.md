@@ -91,7 +91,12 @@ The Dockerfile has been provided for you already. You can run it through vs Code
 
 ## Running the Simulation
 
-Once the sim files are installed, you can launch the simulation with the following command. Make sure that you are still inside the `simulation_files` folder.
+Once the sim files are installed, you can launch the simulation with the following commands. Navigate to the `simulation_files` folder by doing:
+
+```bash
+cd simulation_files
+```
+Run the simulation file with:
 
 ```bash
 ros2 launch turtlebot_tic_world.launch.py
