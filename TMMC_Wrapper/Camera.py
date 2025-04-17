@@ -2,12 +2,15 @@ import cv2
 import apriltag
 import numpy as np
 import rclpy
+from .Robot import Robot
+from ultralytics import YOLO
 
 class Camera:
-    def __init__(self, robot):
+    def __init__(self, robot : Robot):
         self.robot = robot
 
-    def checkImage(self):
+    def checkImage(self) -> np.ndarray:
+        ''' Waits for the robot\'s image future to complete, then returns the latest image message. '''
         self.robot.image_future = rclpy.Future()
         try:
             self.robot.spin_until_future_completed(self.robot.image_future)
@@ -18,6 +21,7 @@ class Camera:
         return self.robot.last_image_msg
 
     def checkImageRelease(self): #this one returns an actual image instead of all the data
+        ''' Retrieves the latest image message, reshapes its data into a 3D image array, and displays it using OpenCV. '''
         image = self.robot.checkImage()
         height = image.height
         width = image.width
@@ -26,16 +30,14 @@ class Camera:
         cv2.imshow("image", img_3D)
         cv2.waitKey(10)
 
-    def checkCamera(self):
+    def checkCamera(self) -> np.ndarray:
+        ''' Waits for and returns the most recent camera info message using the robot\'s camera info future. '''
         self.robot.camera_info_future = rclpy.Future()
         self.robot.spin_until_future_completed(self.robot.camera_info_future)
         return self.robot.last_camera_info_msg 
 
-    def estimate_apriltag_pose(self, image):
-        """
-        Detects all AprilTags in the image and returns a list of tuples:
-        (tag_id, range, bearing, elevation) for each detected tag.
-        """
+    def estimate_apriltag_pose(self, image : np.ndarray) -> list[tuple[int, float, float, float]]:
+        ''' Converts the image to grayscale, detects AprilTags, and, if successful, estimates the pose. '''
         # Convert image to grayscale for tag detection
         img_gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
         detections = apriltag.Detector(apriltag.DetectorOptions(families="tag16h5, tag25h9")).detect(img_gray)
@@ -72,7 +74,8 @@ class Camera:
 
         return poses
     
-    def rosImg_to_cv2(self):
+    def rosImg_to_cv2(self) -> np.ndarray:
+        ''' Retrieves the current ROS image message, reshapes its raw data into three-channel image, and returns it. '''
         image = self.checkImage()
         if image is None:
             # Gracefully handle the case when no image was received.
@@ -83,7 +86,8 @@ class Camera:
         img_3D = np.reshape(img_data, (height, width, 3))
         return img_3D
 
-    def ML_predict_stop_sign(self, model, img):
+    def ML_predict_stop_sign(self, model : YOLO, img : np.ndarray) -> tuple[bool, int, int, int, int]:
+        ''' Uses the provided ML model to predict the presence of a stop sign within the image, draws a bounding box around any detection, displays the result, and returns both the detection flag and bounding box coords. '''
         # height, width = image.shape[:2]
         # imgsz = (width, height)
 
@@ -117,12 +121,8 @@ class Camera:
     
 
     @staticmethod
-    def red_filter(img):
-        """
-        mask image for red only area, note that the red HSV bound values are tunable and should be adjusted base on evironment
-        :param img: list RGB image array
-        :return: list RGB image array of binary filtered image
-        """
+    def red_filter(img : np.ndarray) -> np.ndarray:
+        ''' Applies a series of image processing steps, including HSV conversion, thresholding, and morphological operations, to filter the input image for red regions and produce a binary mask. '''
         # Colour Segmentation
         hsv_img = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
 
@@ -163,7 +163,8 @@ class Camera:
         return filtered_img
 
     @staticmethod
-    def add_contour(img):
+    def add_contour(img : np.ndarray) -> tuple[np.ndarray, float, tuple[int, int]]:
+        ''' Finds all external contours in the provided binary image, identifies the largest one, approximates its polygon, draws it along with its centroid on a blank image and returns the contoured image along with the contour\'s area and centroid. '''
         max_area = 0    
         contours, _ = cv2.findContours(img, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
         contoured = np.zeros((img.shape[0], img.shape[1], 3), dtype=np.uint8)

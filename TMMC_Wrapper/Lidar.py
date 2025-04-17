@@ -1,14 +1,18 @@
-import numpy as np
+from .Robot import Robot
+from sensor_msgs.msg import LaserScan
 
 class Lidar:
-    def __init__(self, robot):
+    def __init__(self, robot : Robot):
+        '''Initializes the Lidar object by storing a reference to the provided robot. '''
         self.robot = robot
 
-    def checkScan(self):
+    def checkScan(self) -> LaserScan:
+        ''' Waits until a new scan message is received and returns that scan message. '''
         self.robot.spin_until_future_completed(self.robot.scan_future)
         return self.robot.last_scan_msg
 
-    def detect_obstacle_in_cone(self, scan, distance, center, offset_angle):
+    def detect_obstacle_in_cone(self, scan, distance, center, offset_angle) -> tuple[float, float]:
+        ''' Analyzes the scan data within the cone to detect and return the distance and angle of the closest obstacle. '''
         obstacle_dist = distance
 
         if scan is None:

@@ -6,13 +6,16 @@ import rclpy
 import math
 import threading
 from pynput.keyboard import Listener
+from .Robot import Robot
 
 class Control:
-    def __init__(self, robot):
+    def __init__(self, robot : Robot):
+        ''' Initializes the control object by storing the robot reference. '''
         self.robot = robot
         self.imu = IMU(self.robot)
 
-    def set_cmd_vel(self, velocity_x, velocity_phi, duration):
+    def set_cmd_vel(self, velocity_x : float, velocity_phi : float, duration : float):
+        """ Sets up and initiates a timer-based process to continuously publish velocity commands for the specified duration. """
         self.velocity_x = velocity_x
         self.velocity_phi = velocity_phi
         self.end_time = time.time() + duration
@@ -23,6 +26,7 @@ class Control:
         rclpy.spin_until_future_complete(self.robot,self.cmd_vel_future)  
 
     def cmd_vel_timer_callback(self):
+        ''' Acts as the timer callback that continuously publishes velocity commands until the duration expires. '''
         if self.cmd_vel_terminate:
             self.cmd_vel_future.set_result(None)
             self.cmd_vel_timer.cancel()
@@ -38,8 +42,8 @@ class Control:
             msg.angular.z = float(self.velocity_phi)
         self.robot.cmd_vel_publisher.publish(msg)
         
-    def undock(self):
-        # does not wait until finished
+    def undock(self) -> Undock.Result:
+        ''' Sends an asynchronous undock goal to the robot, waits for the action to complete, and returns the corresponding result. '''
         if not self.robot.IS_SIM:
             action_completed_future = rclpy.Future()
             def result_cb(future):
@@ -57,7 +61,8 @@ class Control:
             rclpy.spin_until_future_complete(self.robot,action_completed_future)
             return action_completed_future.result()
         
-    def dock(self):
+    def dock(self) -> Dock.Result:
+        ''' Sends an asynchronous dock goal to the robot, waits for the action to complete, and returns the resulting outcome. '''
         if not self.robot.IS_SIM:
             action_completed_future = rclpy.Future()
             def result_cb(future):
@@ -75,7 +80,8 @@ class Control:
             rclpy.spin_until_future_complete(self.robot,action_completed_future)
             return action_completed_future.result()
 
-    def rotate(self, angle, direction):
+    def rotate(self, angle : float, direction : int):
+        ''' Continuously monitors the robot’s orientation using its IMU, issuing turning commands until the robot has rotated by the desired angle, then stops the rotation. '''
         q_initial = self.imu.checkImu().orientation
         _, _, yaw_start = self.imu.euler_from_quaternion(q_initial)
         yaw_start_deg = math.degrees(yaw_start)
@@ -100,19 +106,23 @@ class Control:
             print("turn complete")
 
         
-    def send_cmd_vel(self, linear_x, angular_z):
+    def send_cmd_vel(self, linear_x : float, angular_z : float):
+        ''' Publishes a twist message to robot\'s command velocity topic using the provided linear and angular velocity values. '''
         msg = Twist()
         msg.linear.x = linear_x
         msg.angular.z = angular_z
         self.robot.cmd_vel_publisher.publish(msg)
 
     def stop_keyboard_input(self):
+        ''' Disables the processing of keyboard inputs by setting the robot\'s input flag to false. '''
         self.robot.input = False
 
     def start_keyboard_input(self):
+        ''' Enables keyboard input processing by setting the robot\'s input flag to true. '''
         self.robot.input = True
 
     def start_keyboard_control(self):
+        ''' Initiates a keyboard listener and a dedicated update thread that continuously checks pressed keys to translate them into movement commands. '''
         if self.robot.keyboard_listener is None:
             # This set holds keys that are currently pressed.
             pressed_keys = set()
@@ -188,6 +198,7 @@ class Control:
             print("Keyboard listener already running")
 
     def stop_keyboard_control(self):
+        ''' Stops the keyboard listener and terminates the update thread for keyboard control. '''
         if self.robot.keyboard_listener is not None:
             self.robot.keyboard_listener.stop()
             self.robot.keyboard_listener = None
@@ -201,13 +212,17 @@ class Control:
             self.robot.update_thread.join()
 
     def move_forward(self):
+        ''' Sends a command to move the robot forward at a speed scaled by the robot\'s constant speed control factor. '''
         self.send_cmd_vel(self.robot.CONST_speed_control, 0.0)
 
     def move_backward(self):
-        self.send_cmd_vel(-1.0*self.robot.CONST_speed_control, 0.0)
+        ''' Sends a command to move the robot backward at a speed scaled by the robot\'s constant speed control factor. '''
+        self.send_cmd_vel(-self.robot.CONST_speed_control, 0.0)
 
     def turn_left(self):
+        ''' Sends a command to turn the robot left at an angular velocity scaled by the robot\'s constant speed control factor. '''
         self.send_cmd_vel(0.0, self.robot.CONST_speed_control)
 
     def turn_right(self):
-        self.send_cmd_vel(0.0, -1.0*self.robot.CONST_speed_control)
+        ''' Sends a command to turn the robot right at an angular velocity scaled by the robot\'s constant speed control factor. '''
+        self.send_cmd_vel(0.0, -self.robot.CONST_speed_control)
