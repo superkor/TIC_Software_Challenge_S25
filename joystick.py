@@ -7,7 +7,7 @@ if not rclpy.ok():
     rclpy.init()
 
 if not "robot" in globals():
-    robot = Robot(is_SIM = False)
+    robot = Robot(IS_SIM = False)
 
 control = Control(robot)
 battery = Battery(robot)
