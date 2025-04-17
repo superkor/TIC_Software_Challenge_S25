@@ -19,6 +19,10 @@ class Lidar:
             print("Warning: No LIDAR Data")
             return -1,-1
         
+        if offset_angle < 0 or offset_angle >= 180:
+            print("Warning: Offset angle must be between 0 and 180 degrees.")
+            return -1, -1
+        
         # Need to seperate the logic for simulation and real robot
         # because the angles are different in the two cases.
         # In simulation, the angles are in degrees and range from 0 to 360.
