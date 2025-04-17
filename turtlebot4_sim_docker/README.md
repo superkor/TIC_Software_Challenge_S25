@@ -81,9 +81,9 @@ The Dockerfile has been provided for you already. You can run it through vs Code
   ```
 ### 2. Run the Docker through vs code
 
-- Open VS code and type ctrl + shift + p
+- Open the repository folder in VSCode
 
-- Then type in the search bar "Dev Containers: Rebuild and Reopen in Container: 
+- Press ctrl + shift + p and type in the search bar "Dev Containers: Rebuild and Reopen in Container: 
 
 - Now your code and terminal commands within vs code will run through the docker.
 
