@@ -154,7 +154,6 @@ class Camera:
         (T, threshInv) = cv2.threshold(blurred, 0, 255,
         cv2.THRESH_BINARY | cv2.THRESH_OTSU)
         cv2.imshow("Threshold", threshInv)
-        # print("[INFO] otsu's thresholding value: {}".format(T))
 
         #Morphological closing
         kernel_dim = (21,21)

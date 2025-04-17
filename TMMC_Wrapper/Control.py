@@ -202,7 +202,8 @@ class Control:
         if self.robot.keyboard_listener is not None:
             self.robot.keyboard_listener.stop()
             self.robot.keyboard_listener = None
-            print("Keyb list stopped")
+            if self.robot.DEBUG:
+                print("Keyb list stopped")
         else: 
             print("Keyb list is not running")
 

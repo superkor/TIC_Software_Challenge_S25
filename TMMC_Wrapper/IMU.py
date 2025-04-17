@@ -65,8 +65,8 @@ class IMU:
         q_rel = self.quaternion_multiply(orientation2, q1_inv)
         rotation_angle = self.rotation_angle(q_rel)
 
-        #print(f"Original q: {round(orientation1.w,2), round(orientation1.x,2), round(orientation1.y,2), round(orientation1.z,2)} and current q: {round(orientation2.w,2), round(orientation2.x,2), round(orientation2.y,2), round(orientation2.z,2)}")
-        print("current rotation: ", math.degrees(rotation_angle))
+        if self.robot.DEBUG:
+          print("current rotation: ", math.degrees(rotation_angle))
 
         #is desired angle met
         return math.isclose(rotation_angle, desired_rotation_angle, abs_tol=0.01)  # Adjust tolerance as needed
