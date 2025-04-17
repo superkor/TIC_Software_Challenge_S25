@@ -14,10 +14,7 @@ is_SIM = True
 # Set to True if you want to run in debug mode with extra print statements, False otherwise
 Debug = False
 
-# Initialization
-if not rclpy.ok():
-    rclpy.init()
-    
+# Initialization    
 if not "robot" in globals():
     robot = Robot(IS_SIM=is_SIM, DEBUG=Debug)
     

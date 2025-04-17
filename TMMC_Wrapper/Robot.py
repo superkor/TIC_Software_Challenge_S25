@@ -19,6 +19,8 @@ class Robot(Node):
         self.DEBUG = DEBUG
         self.TAG_SIZE = TAG_SIZE
         self.CONST_speed_control = CONST_speed_control
+        if not rclpy.ok():
+            rclpy.init()
         self.use_hardware()
         super().__init__('notebook_wrapper')
         # Create custom qos profile to make subscribers time out faster once notebook
