@@ -13,7 +13,8 @@ import rclpy.qos
 from copy import copy
 
 class Robot(Node):
-    def __init__(self, IS_SIM = True, DEBUG = False, TAG_SIZE = 0.25, CONST_speed_control = 1):
+    def __init__(self, IS_SIM : bool = True, DEBUG : bool = False, TAG_SIZE : float = 0.25, CONST_speed_control : float = 1.0):
+        ''' Set up the ros2 node for all the subscribers needed in the challenge as well as run use_hardware when IS_SIM is False. '''
         # Set constants 
         self.IS_SIM = IS_SIM
         self.DEBUG = DEBUG
@@ -26,8 +27,6 @@ class Robot(Node):
         # Create custom qos profile to make subscribers time out faster once notebook
         qos_profile_sensor_data = copy(rclpy.qos.qos_profile_sensor_data)
         qos_policy = copy(rclpy.qos.qos_profile_sensor_data)
-        #qos_policy.liveliness = rclpy.qos.LivelinessPolicy.MANUAL_BY_TOPIC
-        #qos_policy.liveliness_lease_duration = rclpy.time.Duration(seconds=10)
 
         self.last_scan_msg = None
         self.last_imu_msg = None
@@ -78,6 +77,7 @@ class Robot(Node):
 
 
     def use_hardware(self):
+        ''' Completes the connection to the robot as well as sending pings (only should be used if not in sim). '''
         if not self.IS_SIM:
             # import ROS settings for working locally or with the robot (equivalent of ros_local/ros_robot in the shell)
             env_file = ".env_ros_robot"
@@ -100,39 +100,45 @@ class Robot(Node):
                 print("ros2 topic echo --once /ip failed. Proceed with caution.")
             print("ros2 topic subscription working. Everything is working as expected.")
  
-    def spin_until_future_completed(self, future):
+    def spin_until_future_completed(self, future : rclpy.task.Future):
+        ''' Spins the ros2 node until a future completes then returns the result of the given future. '''
         rclpy.spin_until_future_complete(self,future)
         return future.result()
 
     # Callback Functions
     
-    def scan_listener_callback(self, msg):
+    def scan_listener_callback(self, msg : LaserScan):
+        ''' This function is used to store the latest scan received from the turtlebot. '''
         self.last_scan_msg = msg
         if self.DEBUG == True:
             print(f"Laserscan data recieved: Range - {msg.ranges[:5]}")
         self.scan_future.set_result(msg)
         self.scan_future.done()
         
-    def imu_listener_callback(self, msg):
+    def imu_listener_callback(self, msg : Imu):
+        ''' This function is used to store the latest imu quaternion received from the turtlebot. '''
         self.last_imu_msg = msg
         if self.DEBUG == True:
             print(f"IMU Data recieved: orientation - {msg.orientation}")
         self.imu_future.set_result(msg)
         self.imu_future.done()
         
-    def image_listener_callback(self, msg):
+    def image_listener_callback(self, msg : Image):
+        ''' This function is used to store the latest image from the camera. '''
         self.last_image_msg = msg
         self.image_future.set_result(msg)
         self.image_future.done()
 
-    def camera_info_listener_callback(self, msg):
+    def camera_info_listener_callback(self, msg : CameraInfo):
+        ''' This function is used to store camera information. '''
         self.last_camera_info_msg = msg
         if self.k is None:
             self.k = np.array(msg.k).reshape((3, 3))
         self.camera_info_future.set_result(msg)
         self.camera_info_future.done()
     
-    def battery_state_listener_callback(self, msg):
+    def battery_state_listener_callback(self, msg : BatteryState):
+        ''' This function is used to store the latest battery percentage from the turtlebot. '''
         self.last_battery_state_msg = msg
         self.battery_state_future.set_result(msg)
         self.battery_state_future.done()

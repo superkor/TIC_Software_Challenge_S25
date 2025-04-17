@@ -201,13 +201,13 @@ class Control:
             self.robot.update_thread.join()
 
     def move_forward(self):
-        self.send_cmd_vel(1.0*self.robot.CONST_speed_control, 0.0)
+        self.send_cmd_vel(self.robot.CONST_speed_control, 0.0)
 
     def move_backward(self):
         self.send_cmd_vel(-1.0*self.robot.CONST_speed_control, 0.0)
 
     def turn_left(self):
-        self.send_cmd_vel(0.0, 1.0*self.robot.CONST_speed_control)
+        self.send_cmd_vel(0.0, self.robot.CONST_speed_control)
 
     def turn_right(self):
         self.send_cmd_vel(0.0, -1.0*self.robot.CONST_speed_control)
