@@ -20,6 +20,7 @@ class Lidar:
             print("Warning: No LIDAR Data")
             return -1,-1
                 
+        # Map center angle to the range [0, 360] instead of [-180, 180]
         while center >= 360:
             center = center - 360
         while center < 0:
@@ -29,18 +30,21 @@ class Lidar:
         # because the angles are different in the two cases.
         # In simulation, the angles are in degrees and range from 0 to 360.
         # In the real robot, the angles are in degrees and range from 0 to 720.
-        if self.robot.IS_SIM:    
+        if self.robot.IS_SIM:  
+            # Simulation case  
+            # Simulated lidar starts with 0 degrees at the front of the robot and goes clockwise so no need to adjust the center angle
             center = int(center)
             offset_angle = int(offset_angle)        
             right = center - offset_angle
             left = center + offset_angle
 
+            # Get the desired range
             if left >= 360:
                 left = left - 360
             if right < 0:
                 right = right + 360
 
-            # Get the smallest distance in the relevent range
+            # Look from left to right going clockwise
             if right == left:
                 relevent_range = scan.ranges[0:360]
                 min_dist = min(relevent_range)
@@ -54,7 +58,6 @@ class Lidar:
                 print(min_dist_index)
                 if min_dist_index > left:
                     min_dist_index = min_dist_index + right - left
-                
             else:
                 relevent_range = scan.ranges[right:left]
                 min_dist = min(relevent_range)
@@ -63,20 +66,27 @@ class Lidar:
             
             min_dist_angle = min_dist_index
         else:
+            # Non-simulation case
+            # Non-simulated lidar starts with 0 degrees at the right side of the robot and goes counter-clockwise
+            # so we need to adjust the center angle by 90 degrees
             if center < 270:
                 center += 90
             else:
                 center -= 270
-            
+                
+            # need to map everything to half-angles
             center = int(center * 2)
             offset_angle = int(offset_angle * 2)
+            
+            # Get the relevent range
             right = center - offset_angle
             left = center + offset_angle
             if left >= 720:
                 left = left - 720
             if right < 0:
                 right = right + 720
-            # Get the smallest distance in the relevent range
+                
+            # Look from left to right going clockwise
             if right == left:
                 relevent_range = scan.ranges[0:720]
                 min_dist = min(relevent_range)
@@ -95,14 +105,16 @@ class Lidar:
                 min_dist_index = relevent_range.index(min_dist)
                 min_dist_index = min_dist_index + right
             
+            # Remap the half angle to the full angle
             min_dist_angle = min_dist_index / 2.0 - 90
             if min_dist_angle < 0:
                 min_dist_angle = min_dist_angle + 360
             
-        
+        # Put result back to the original range of [-180, 180]
         if min_dist_angle >= 180:
             min_dist_angle = min_dist_angle - 360
 
+        # Check if the minimum distance is less than or equal to the specified distance
         if min_dist <= distance:
             return min_dist, min_dist_angle
         
