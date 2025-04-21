@@ -11,7 +11,7 @@ class Lidar:
         self.robot.spin_until_future_completed(self.robot.scan_future)
         return self.robot.last_scan_msg
 
-    def detect_obstacle_in_cone(self, scan, distance, center, offset_angle) -> tuple[float, float]:
+    def detect_obstacle_in_cone(self, scan : LaserScan, distance : float, center : float, offset_angle : float) -> tuple[float, float]:
         ''' Analyzes the scan data within the cone to detect and return the distance and angle of the closest obstacle. '''
         if offset_angle < 0 or offset_angle > 180:
             raise ValueError("offset_angle must be between 0 and 180 degrees")
@@ -25,6 +25,8 @@ class Lidar:
         # In simulation, the angles are in degrees and range from 0 to 360.
         # In the real robot, the angles are in degrees and range from 0 to 720.
         if self.robot.IS_SIM:
+            center = int(center)
+            offset_angle = int(offset_angle)
             # Find the relevent range
             while center >= 360:
                 center = center - 360
@@ -57,6 +59,7 @@ class Lidar:
             min_dist_angle = min_dist_index
             if min_dist_angle > 180:
                 min_dist_angle = min_dist_angle - 360
+        
         else:
             # Find the relevent range
             new_center = center + 180
