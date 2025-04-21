@@ -7,6 +7,7 @@ from rclpy.serialization import deserialize_message
 import shutil
 import signal
 from .Robot import Robot
+from typing import Any
 
 class Logging:
     def __init__(self, robot : Robot):
@@ -21,7 +22,7 @@ class Logging:
         ''' Begins the logging process by creating a unique directory, to record ROS2 bag data for the configured topics. '''
         if hasattr(self.robot,'logging_instance'):
             raise Exception("logging already active")
-        self.robot.logging_dir = bag_dir = '/tmp/notebook_bag_'+str(int(time.time()))
+        self.robot.logging_dir = '/tmp/notebook_bag_'+str(int(time.time()))
         self.robot.logging_instance = subprocess.Popen("ros2 bag record -s mcap --output "+self.robot.logging_dir+" "+' '.join(self.robot.logging_topics)+" > /tmp/ros2_bag.log 2>&1",shell=True,stdout=subprocess.PIPE,preexec_fn=os.setsid)
         time.sleep(5)
         
@@ -32,7 +33,7 @@ class Logging:
         del self.robot.logging_instance
         return self.robot.logging_dir
             
-    def get_logging_data(self, logging_dir : str) -> dict:
+    def get_logging_data(self, logging_dir : str) -> dict[str, list[tuple[int, Any]]]:
         ''' Reads the recorded messages from the ROS2 bag, aggregating the data into a dictionary keyed by topic. '''
         reader = rosbag2_py.SequentialReader()
         storage_options = rosbag2_py.StorageOptions(uri=logging_dir,storage_id='mcap')
