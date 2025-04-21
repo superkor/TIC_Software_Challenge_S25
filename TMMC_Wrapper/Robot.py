@@ -75,7 +75,10 @@ class Robot(Node):
 
         self.input = True
         self.k = None
-        print("Initialization complete! Current robot battery percent: ", self.checkBattery())
+        if(self.IS_SIM):
+            print("Initialization complete!")
+        else:
+            print("Initialization complete! Current robot battery percent: ", self.checkBattery())
 
 
 
