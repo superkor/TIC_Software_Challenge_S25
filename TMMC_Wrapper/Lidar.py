@@ -20,19 +20,18 @@ class Lidar:
             print("Warning: No LIDAR Data")
             return -1,-1
                 
+        while center >= 360:
+            center = center - 360
+        while center < 0:
+            center = center + 360
+
         # Need to seperate the logic for simulation and real robot
         # because the angles are different in the two cases.
         # In simulation, the angles are in degrees and range from 0 to 360.
         # In the real robot, the angles are in degrees and range from 0 to 720.
-        if self.robot.IS_SIM:
+        if self.robot.IS_SIM:    
             center = int(center)
-            offset_angle = int(offset_angle)
-            # Find the relevent range
-            while center >= 360:
-                center = center - 360
-            while center < 0:
-                center = center + 360
-            
+            offset_angle = int(offset_angle)        
             right = center - offset_angle
             left = center + offset_angle
 
@@ -52,51 +51,57 @@ class Lidar:
                 relevent_range = relevent_1 + relevent_2
                 min_dist = min(relevent_range)
                 min_dist_index = relevent_range.index(min_dist)
+                print(min_dist_index)
+                if min_dist_index > left:
+                    min_dist_index = min_dist_index + right - left
+                
             else:
                 relevent_range = scan.ranges[right:left]
                 min_dist = min(relevent_range)
                 min_dist_index = relevent_range.index(min_dist)
+                min_dist_index = min_dist_index + right
+            
             min_dist_angle = min_dist_index
-            if min_dist_angle > 180:
-                min_dist_angle = min_dist_angle - 360
-        
         else:
-            # Find the relevent range
-            new_center = center + 180
-
-            if new_center >= 720:
-                new_center = 720 - new_center
-
-            left = new_center + (offset_angle * 2)
-            right = new_center - (offset_angle * 2)
-
+            if center < 270:
+                center += 90
+            else:
+                center -= 270
+            
+            center = int(center * 2)
+            offset_angle = int(offset_angle * 2)
+            right = center - offset_angle
+            left = center + offset_angle
             if left >= 720:
                 left = left - 720
-
             if right < 0:
                 right = right + 720
-            
             # Get the smallest distance in the relevent range
-            if right > left:
-                relevent_1 = scan.ranges[0:(left + 1)]
+            if right == left:
+                relevent_range = scan.ranges[0:720]
+                min_dist = min(relevent_range)
+                min_dist_index = relevent_range.index(min_dist)
+            elif right > left:
+                relevent_1 = scan.ranges[0:left]
                 relevent_2 = scan.ranges[right: 720]
                 relevent_range = relevent_1 + relevent_2
-
-                #filtered = [x for x in relevent_range if x > 0.14]
-
                 min_dist = min(relevent_range)
                 min_dist_index = relevent_range.index(min_dist)
-
                 if min_dist_index > left:
-                    min_dist_angle = (left - min_dist_index) / 2
-                else:
-                    min_dist_angle = min_dist_index / 2
+                    min_dist_index = min_dist_index + right - left
             else:
-                relevent_range = scan.ranges[right:(left + 1)]
-                #filtered = [x for x in relevent_range if x > 0.14]
+                relevent_range = scan.ranges[right:left]
                 min_dist = min(relevent_range)
                 min_dist_index = relevent_range.index(min_dist)
-                min_dist_angle = (min_dist_index + right) / 2 - 90
+                min_dist_index = min_dist_index + right
+            
+            min_dist_angle = min_dist_index / 2.0 - 90
+            if min_dist_angle < 0:
+                min_dist_angle = min_dist_angle + 360
+            
+        
+        if min_dist_angle >= 180:
+            min_dist_angle = min_dist_angle - 360
 
         if min_dist <= distance:
             return min_dist, min_dist_angle

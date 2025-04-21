@@ -73,7 +73,7 @@ except KeyboardInterrupt:
     print("Keyboard interrupt received. Stopping...")
 
 finally:
-    robot.stop_keyboard_control()
+    control.stop_keyboard_control()
     robot.destroy_node()
     if rclpy.ok():
         rclpy.shutdown()
