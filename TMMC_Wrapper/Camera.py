@@ -8,6 +8,8 @@ from ultralytics import YOLO
 class Camera:
     def __init__(self, robot : Robot):
         self.robot = robot
+        self.model = None
+
 
     def checkImage(self) -> np.ndarray:
         ''' Waits for the robot\'s image future to complete, then returns the latest image message. '''
@@ -22,7 +24,7 @@ class Camera:
 
     def checkImageRelease(self): #this one returns an actual image instead of all the data
         ''' Retrieves the latest image message, reshapes its data into a 3D image array, and displays it using OpenCV. '''
-        image = self.robot.checkImage()
+        image = self.checkImage()
         height = image.height
         width = image.width
         img_data = image.data
@@ -87,11 +89,11 @@ class Camera:
         img_3D = np.reshape(img_data, (height, width, 3))
         return img_3D
 
-    def ML_predict_stop_sign(self, model : YOLO, img : np.ndarray) -> tuple[bool, int, int, int, int]:
+    def ML_predict_stop_sign(self, img : np.ndarray) -> tuple[bool, int, int, int, int]:
         ''' Uses the provided ML model to predict the presence of a stop sign within the image, draws a bounding box around any detection, displays the result, and returns both the detection flag and bounding box coords. '''
-        # height, width = image.shape[:2]
-        # imgsz = (width, height)
-
+        if self.model == None:
+            self.model = YOLO("yolov8n.pt")  # Load the YOLOv8 model
+        
         stop_sign_detected = False
 
         x1 = -1
@@ -100,7 +102,7 @@ class Camera:
         y2 = -1
 
         # Predict stop signs in image using model
-        results = model.predict(img, classes=[11], conf=0.25, imgsz=640, max_det=1)
+        results = self.model.predict(img, classes=[11], conf=0.25, imgsz=640, max_det=1)
         
         # Results is a list containing the results object with all data
         results_obj = results[0]
@@ -119,77 +121,3 @@ class Camera:
         cv2.imshow("Bounding Box", img)
 
         return stop_sign_detected, x1, y1, x2, y2   
-    
-
-    @staticmethod
-    def red_filter(img : np.ndarray) -> np.ndarray:
-        ''' Applies a series of image processing steps, including HSV conversion, thresholding, and morphological operations, to filter the input image for red regions and produce a binary mask. '''
-        # Colour Segmentation
-        hsv_img = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
-
-        # Define lower and upper bounds for red and brown hue
-        lower_red_1 = np.array([-3, 100, 0])     # Lower bound for red hue (reddish)
-        lower_red_2 = np.array([170, 70, 50])   # Lower bound for red hue (reddish)
-        upper_red_1 = np.array([3, 255, 255])  # Upper bound for red hue (reddish)
-        upper_red_2 = np.array([180, 255, 255]) # Upper bound for red hue (reddish)
-        lower_brown = np.array([10, 60, 30])    # Lower bound for brown hue
-        upper_brown = np.array([30, 255, 255])  # Upper bound for brown hue
-        
-        # Create masks for red and brown
-        red_mask_1 = cv2.inRange(hsv_img, lower_red_1, upper_red_1)
-        red_mask_2 = cv2.inRange(hsv_img, lower_red_2, upper_red_2)
-        brown_mask = cv2.inRange(hsv_img, lower_brown, upper_brown)
-
-        # Combine red masks
-        red_mask = cv2.bitwise_or(red_mask_1, red_mask_2)
-        # Exclude brown by subtracting its mask from the red mask
-        red_mask = cv2.subtract(red_mask, brown_mask)
-
-        # Apply the red mask to the original image then convert to grayscale
-        red_img = cv2.bitwise_and(img, img, mask=red_mask)
-        gray = cv2.cvtColor(red_img, cv2.COLOR_BGR2GRAY)
-        blurred = cv2.GaussianBlur(gray, (11, 11), 0)
-
-        #get binary image with OTSU thresholding
-        (T, threshInv) = cv2.threshold(blurred, 0, 255,
-        cv2.THRESH_BINARY | cv2.THRESH_OTSU)
-        cv2.imshow("Threshold", threshInv)
-
-        #Morphological closing
-        kernel_dim = (21,21)
-        kernel = cv2.getStructuringElement(cv2.MORPH_RECT, kernel_dim)
-        filtered_img = cv2.morphologyEx(threshInv, cv2.MORPH_CLOSE, kernel)
-        
-        return filtered_img
-
-    @staticmethod
-    def add_contour(img : np.ndarray) -> tuple[np.ndarray, float, tuple[int, int]]:
-        ''' Finds all external contours in the provided binary image, identifies the largest one, approximates its polygon, draws it along with its centroid on a blank image and returns the contoured image along with the contour\'s area and centroid. '''
-        max_area = 0    
-        contours, _ = cv2.findContours(img, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-        contoured = np.zeros((img.shape[0], img.shape[1], 3), dtype=np.uint8)
-        cX, cY = 0, 0  # Default centroid coordinates in case processing fails.
-        try:
-            areas_of_contours = [cv2.contourArea(contour) for contour in contours]
-            max_poly_indx = np.argmax(areas_of_contours)
-            stop_sign = contours[max_poly_indx]
-            epsilon = 0.01 * cv2.arcLength(stop_sign, True)
-            approx_polygon = cv2.approxPolyDP(stop_sign, epsilon, True)
-            area = cv2.contourArea(approx_polygon)
-            max_area = max(max_area, area)
-            cv2.drawContours(contoured, [approx_polygon], -1, (0, 255, 0), 3)
-
-            M = cv2.moments(stop_sign)
-            if M["m00"] != 0:  # Check to avoid division by zero
-                cX = int(M["m10"] / M["m00"])
-                cY = int(M["m01"] / M["m00"])
-                cv2.circle(contoured, (cX, cY), 2, (255, 255, 255), -1)
-            else:
-                # Define alternative behavior if contour area is zero.
-                cX, cY = -1, -1
-        except Exception as e:
-            # Optionally log the error e for debugging.
-            # Return default values if an error occurs.
-            cX, cY = -1, -1
-
-        return contoured, max_area, (cX, cY)
