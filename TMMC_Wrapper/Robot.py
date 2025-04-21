@@ -142,3 +142,9 @@ class Robot(Node):
         self.last_battery_state_msg = msg
         self.battery_state_future.set_result(msg)
         self.battery_state_future.done()
+
+    def checkBattery(self) -> float:
+        ''' Waits for the robot\'s battery state update to be completed and then returns the battery percentage from the latest message. '''
+        self.battery_state_future = rclpy.Future()
+        self.spin_until_future_completed(self.robot.battery_state_future)
+        return self.last_battery_state_msg.percentage
