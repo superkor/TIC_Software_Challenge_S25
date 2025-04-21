@@ -62,7 +62,6 @@ class Robot(Node):
             self.undock_client = ActionClient(self, Undock, '/undock')
             self.dock_client.wait_for_server()
             self.undock_client.wait_for_server()
-            print("Current robot battery percent: ",self.checkBattery())
 
         
         self.tf_buffer = tf2_ros.buffer.Buffer()
@@ -76,6 +75,8 @@ class Robot(Node):
 
         self.input = True
         self.k = None
+        print("Initialization complete! Current robot battery percent: ", self.checkBattery())
+
 
 
     def use_hardware(self):
@@ -149,4 +150,4 @@ class Robot(Node):
         ''' Waits for the robot\'s battery state update to be completed and then returns the battery percentage from the latest message. '''
         self.battery_state_future = rclpy.Future()
         self.spin_until_future_completed(self.battery_state_future)
-        return self.last_battery_state_msg.percentage
+        return self.last_battery_state_msg.percentage * 100

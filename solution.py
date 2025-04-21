@@ -5,11 +5,11 @@ import math
 import time
 from ultralytics import YOLO
 
-# Variable for controlling which level of the challenge to test
-challengeLevel = 1
+# Variable for controlling which level of the challenge to test -- set to 0 for pure keyboard control
+challengeLevel = 0
 
 # Set to True if you want to run the simulation, False if you want to run on the real robot
-is_SIM = False
+is_SIM = True
 
 # Set to True if you want to run in debug mode with extra print statements, False otherwise
 Debug = False
@@ -30,6 +30,12 @@ if challengeLevel <= 2:
 
 
 try:
+    if challengeLevel == 0:
+        while rclpy.ok():
+            rclpy.spin_once(robot, timeout_sec=0.1)
+            time.sleep(0.1)
+            # Challenge 0 is pure keyboard control, you do not need to change this it is just for your own testing
+
     if challengeLevel == 1:
         while rclpy.ok():
             rclpy.spin_once(robot, timeout_sec=0.1)
