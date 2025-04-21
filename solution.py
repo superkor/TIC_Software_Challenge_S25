@@ -9,7 +9,7 @@ from ultralytics import YOLO
 challengeLevel = 1
 
 # Set to True if you want to run the simulation, False if you want to run on the real robot
-is_SIM = True
+is_SIM = False
 
 # Set to True if you want to run in debug mode with extra print statements, False otherwise
 Debug = False
@@ -19,7 +19,6 @@ if not "robot" in globals():
     robot = Robot(IS_SIM=is_SIM, DEBUG=Debug)
     
 control = Control(robot)
-battery = Battery(robot)
 camera = Camera(robot)
 imu = IMU(robot)
 logging = Logging(robot)
