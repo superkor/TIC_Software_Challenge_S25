@@ -63,6 +63,9 @@ To start the simulation environment, follow these steps:
 
 The Dockerfile has been provided for you already. You can run it through vs Code following these steps:
 
+- Install Dev Containers within vscode extensions
+  - Find it in the extensions section on the left
+
 - Go into terminal and type:
   ```bash
   sudo usermod -aG docker $USER
@@ -81,8 +84,6 @@ The Dockerfile has been provided for you already. You can run it through vs Code
 ### 2. Run the Docker through vs code
 
 - Open the repository folder in VSCode
-
-- Install Dev Containers within vscode extensions
 
 - Press ctrl + shift + p and type in the search bar "Dev Containers: Rebuild and Reopen in Container: 
 
