@@ -66,7 +66,7 @@ The Dockerfile has been provided for you already. You can run it through vs Code
   ```bash
   sudo usermod -aG docker $USER
   ```
-- Restart the VM by clicking player in the top left then power.
+- Restart the VM by clicking player in the top right power button, Power Off/Log Out, Restart.
 
 - Once the VM has restarted open the terminal and type groups making sure docker is there:
   ```bash
