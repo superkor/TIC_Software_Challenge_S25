@@ -115,7 +115,7 @@ Then connect to the robot by running the following script, replacing the <NUMBER
 sudo ./vpn.sh <NUMBER_OF_TURTLEBOT>
 ```
 
-You will know it was successful once you see:
+Follow the instructions in the command prompt, it will ask you to enter your UWaterloo WatID and Password. You will know it was successful once you see:
 ```
 Tunnel ready
 Stopping this process will terminate the VPN
