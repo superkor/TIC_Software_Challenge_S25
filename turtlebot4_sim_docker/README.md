@@ -102,6 +102,13 @@ ros2 launch turtlebot_tic_world.launch.py
 - The Gazebo client (GUI) will appear on your host machine.
 - The ROS2 environment is already set up, including sourcing `/opt/ros/humble/setup.bash` and setting the TurtleBot model to `waffle_pi`.
 
+# NOTE: Running the simulation requires an x server running. In your docker container terminal, add this following if your simulation does not work:
+
+```bash
+apt update && apt install -y x11-apps
+xeyes
+```
+
 ## Connecting to a physical TurtleBot
 
 To run the script to connect to the turtlebot, make sure you are inside the docker container as described in steps 1 and 2. Then navigate to the robohub folder with:
