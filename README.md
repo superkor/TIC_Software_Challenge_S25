@@ -1,9 +1,6 @@
 # Toyota Software Innovation Challenge – Vehicle Automation
 
-## Challenge Description
-The challenge is now live! Find the description, rubric, and presentation template at:
-[https://drive.google.com/drive/folders/1U0qSvJUjqUBoHz40CjrrwecNmML-Dhgb?usp=sharing](https://drive.google.com/drive/folders/1U0qSvJUjqUBoHz40CjrrwecNmML-Dhgb?usp=sharing).
-
+  
 ## Code Documentation
 The documentation for the start code can be found here: 
 [https://docs.google.com/document/d/1OMNe_YqdWdEfYw3CDldJkrOWBQl-ZO1z/edit?usp=sharing&ouid=110563983100333644141&rtpof=true&sd=true](https://docs.google.com/document/d/12ZCDUnK8ZNTADK9_jo7DqGj-spP18uqKYq01TFtF29A/edit?tab=t.0)
