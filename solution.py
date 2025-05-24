@@ -1,3 +1,4 @@
+
 from TMMC_Wrapper import *
 import rclpy
 import numpy as np
@@ -13,7 +14,7 @@ challengeLevel = 5
 is_SIM = True
 
 # Set to True if you want to run in debug mode with extra print statements, False otherwise
-Debug = False
+Debug = True
 
 # Initialization    
 if not "robot" in globals():
@@ -27,9 +28,9 @@ lidar = Lidar(robot)
 
 DEFAULT_APRIL_TAG = {
             "id": -1,
-            "bearing": 9999,
-            "range": 99999,
-            "elevation": 99999
+            "bearing": 99999,
+            "range": 999999,
+            "elevation": 9999999
         }
 
 current_april_tag_info = DEFAULT_APRIL_TAG
@@ -61,22 +62,28 @@ def handle_april_tag():
     """
     This is ran on a thread
     """
+
+    global current_april_tag_info
     while True:
         #This is blocking 
-        print("Thread: getting image")
-        camera_image = camera.checkImage()
-                
+        # print("Thread: getting image")
+        # camera_image = camera.checkImage()
+        cv_im = camera.rosImg_to_cv2()
+        # camera.checkImageRelease()
+
         # Get april tage pose
-        tags: list [tuple [int, float, float, float]] = camera.estimate_apriltag_pose(camera_image)
+        if (cv_im is not None):
+            tags: list [tuple [int, float, float, float]] = camera.estimate_apriltag_pose(cv_im)
                 
         # get april tag and make a control decision
         current_april_tag_info = DEFAULT_APRIL_TAG
                 
         for tag in tags:
-            id: int = tag["Tag_id"]
-            range: float = tag["Range_"]
-            bearing: float = tag["Bearing"]
-            elevation: float = tag["Elevation"]
+            print(f"tag: {tag}")
+            id: int = tag[0]
+            range: float = tag[1]
+            bearing: float = tag[2]
+            elevation: float = tag[3]
                     
             if bearing < current_april_tag_info["bearing"]:
                 #get the closest april tag from the camera baesd on bearing
@@ -89,6 +96,8 @@ def get_april_tag_and_reset() -> dict:
     """
     This returns the april tag detected by the camera and resets the april tag
     """
+
+    global current_april_tag_info
     res = current_april_tag_info
     current_april_tag_info = DEFAULT_APRIL_TAG
     return res
@@ -140,18 +149,20 @@ try:
 
             current_april_tag = get_april_tag_and_reset()
 
-            print(f"april tag {current_april_tag}")
-
             if current_april_tag["id"] == -1:
                 continue #don't perform on the same april tag (before a new camera detects an april tag)
-
             init_imu_msg = imu.checkImu()
+
+            print("Check imu")
             control.rotate(current_april_tag["bearing"], 1)
 
             while True:
+                print("In while")
                 #wait until the robot has rotated to the desired bearing
                 imu_msg = imu.checkImu() #waits until a message from the IMU is received
-                if imu.has_rotation_occurred(init_imu_msg, imu_msg, current_april_tag["bearing"]):
+                cur_angle = imu.rotation_angle(imu_msg.orientation)
+
+                if imu.has_rotation_occurred(init_imu_msg.orientation, imu_msg.orientation, current_april_tag["bearing"]):
                     break
             
             # velocity 
