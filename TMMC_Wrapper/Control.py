@@ -222,8 +222,8 @@ class Control:
 
     def turn_left(self):
         ''' Sends a command to turn the robot left at an angular velocity scaled by the robot\'s constant speed control factor. '''
-        self.send_cmd_vel(0.0, self.robot.CONST_speed_control)
+        self.send_cmd_vel(0.0, 1.0)
 
     def turn_right(self):
         ''' Sends a command to turn the robot right at an angular velocity scaled by the robot\'s constant speed control factor. '''
-        self.send_cmd_vel(0.0, -self.robot.CONST_speed_control)
+        self.send_cmd_vel(0.0, -1.0)

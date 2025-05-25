@@ -69,4 +69,4 @@ class IMU:
           print("current rotation: ", math.degrees(rotation_angle))
 
         #is desired angle met
-        return math.isclose(rotation_angle, desired_rotation_angle, abs_tol=0.01)  # Adjust tolerance as needed
+        return math.isclose(rotation_angle, desired_rotation_angle, abs_tol=0.5)  # Adjust tolerance as needed
